@@ -46,7 +46,6 @@ public class HelloWorldBuilder extends Builder implements SimpleBuildStep {
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
             throws InterruptedException, IOException {
-        // run.addAction(new HelloWorldAction(name));
         listener.getLogger().println("Hello, " + name + "!");
     }
 
@@ -61,13 +60,12 @@ public class HelloWorldBuilder extends Builder implements SimpleBuildStep {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            // TODO Auto-generated method stub
             return true;
         }
 
         public FormValidation doCheckName(@QueryParameter String value, @QueryParameter boolean useFrench)
                 throws IOException, ServletException {
-            System.out.println("doCheckName:" + value);
+            System.out.println("doCheckName value1:    " + value);
             if (value.length() == 0)
                 return FormValidation.error("Please set a name");
             if (value.length() < 4)

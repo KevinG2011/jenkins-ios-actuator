@@ -27,11 +27,6 @@ target/
 /.nb-gradle/
 build/
 
-### VS Code ###
-.vscode/
 
-### JRebel ###
-*rebel.xml
-*rebel.xml.bak
 .DS_Store
 work
