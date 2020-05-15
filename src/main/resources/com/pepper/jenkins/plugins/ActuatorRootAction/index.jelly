@@ -19,7 +19,7 @@
         <p>剩余磁盘空间: ${it.freeDiskSpaceDetail}</p>
       </s:sample>
 
-      <h2>版本维护</h2>
+      <h3>版本维护信息</h3>
     </l:main-panel>
   </l:layout>
 </j:jelly>
