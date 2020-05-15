@@ -1,8 +1,10 @@
 package com.pepper.jenkins.plugins;
 
-import hudson.model.Action;
+import hudson.model.Run;
+import jenkins.model.RunAction2;
 
-public class HelloWorldAction implements Action {
+public class HelloWorldAction implements RunAction2 {
+	private transient Run run;
 	private String name;
 
 	public HelloWorldAction(String name) {
@@ -20,17 +22,34 @@ public class HelloWorldAction implements Action {
 
 	@Override
 	public String getIconFileName() {
-		return "document.png";
+		return null;
 	}
 
 	@Override
 	public String getDisplayName() {
-		return "Greeting";
+		return "状态";
 	}
 
 	@Override
 	public String getUrlName() {
 		return "greeting";
+	}
+
+	@Override
+	public void onAttached(Run<?, ?> run) {
+		this.run = run;
+	}
+
+	@Override
+	public void onLoad(Run<?, ?> run) {
+		this.run = run;
+	}
+
+	/**
+	 * @return the run
+	 */
+	public Run getRun() {
+		return run;
 	}
 
 }
