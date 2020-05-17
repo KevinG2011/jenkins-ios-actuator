@@ -55,7 +55,7 @@ public class HelloWorldBuilder extends Builder implements SimpleBuildStep {
     }
 
     @Extension
-    @Symbol("greet")
+    @Symbol("actuator")
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
         @Override
@@ -65,7 +65,7 @@ public class HelloWorldBuilder extends Builder implements SimpleBuildStep {
 
         public FormValidation doCheckName(@QueryParameter String value, @QueryParameter boolean useFrench)
                 throws IOException, ServletException {
-            System.out.println("doCheckName value:" + value);
+            System.out.println("doCheckName val:" + value);
             if (value.length() == 0)
                 return FormValidation.error("Please set a name");
             if (value.length() < 4)

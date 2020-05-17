@@ -1,0 +1,48 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" 
+         xmlns:st="jelly:stapler" 
+         xmlns:d="jelly:define" 
+         xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" 
+         xmlns:f="/lib/form" 
+         xmlns:i="jelly:fmt">
+    <l:layout title="ParseSymbolAction">
+        <l:side-panel>
+            <l:tasks>
+                <l:task icon="images/24x24/up.gif" href="${rootURL}/"
+                        title="Back to Dashboard"/>
+            </l:tasks>
+        </l:side-panel>    
+        <l:main-panel>
+  <!-- 
+              <j:invokeStatic var="currentThread" className="java.lang.Thread"
+                            method="currentThread"/>
+            <j:invoke var="buildClass" on="${currentThread.contextClassLoader}" method="loadClass">
+                <j:arg value="hudson.model.Run"/>
+            </j:invoke>
+  -->        
+            <h1>崩溃日志解析</h1> 
+            <j:set var="instance" value="${it}"/>
+            <j:set var="uploaded" value="${request.getParameter('uploaded')}"/>                   
+            <f:form method="post" action="." name="symbol" tableClass="parameters">
+                上传崩溃日志
+                <br/>
+                <br/>
+                <input name="dsymFile" type="file" jsonAware="true"/>
+                <br/>
+                <br/>                
+                <f:block>
+                    <input name="uploaded" type="hidden" value="1"/>
+                    <f:submit value="开始解析"/>
+                </f:block>
+            </f:form>
+            <br/>
+            <j:if test="${uploaded != null}">
+                <h2>功能正在开发中...</h2>
+                <div>
+                    Interested in becoming a contributor? Please contact to lijia@huajiao.tv.
+                </div>
+            </j:if>              
+        </l:main-panel>
+    </l:layout>
+</j:jelly>
