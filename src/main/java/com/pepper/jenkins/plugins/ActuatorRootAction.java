@@ -1,6 +1,6 @@
 package com.pepper.jenkins.plugins;
 
-import com.pepper.utils.ActuatorFileUtils;
+import com.pepper.utils.ActuatorDiskUtils;
 
 import hudson.Extension;
 import hudson.model.RootAction;
@@ -24,7 +24,7 @@ public class ActuatorRootAction implements RootAction {
     }
 
     public String getFreeDiskSpaceDetail() {
-        String freeDiskSpaceDetail = ActuatorFileUtils.getFreeDiskSpaceDetail();
+        String freeDiskSpaceDetail = ActuatorDiskUtils.getFreeDiskSpaceDetail();
         System.out.println(freeDiskSpaceDetail);
         return freeDiskSpaceDetail;
     }

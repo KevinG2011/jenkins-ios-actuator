@@ -6,9 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class ActuatorFileUtils {
+public class ActuatorDiskUtils {
 
-    private ActuatorFileUtils() {
+    private ActuatorDiskUtils() {
         throw new IllegalStateException("Utility class");
     }
 
