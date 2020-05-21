@@ -23,16 +23,14 @@
   -->        
             <h1>崩溃日志解析</h1> 
             <j:set var="instance" value="${it}"/>
-            <j:set var="uploaded" value="${request.getParameter('uploaded')}"/>                   
+            <j:set var="uploaded" value="${request.getParameter('uploaded')}"/>                            
             <f:form method="post" action="upload" name="upload" enctype="multipart/form-data">
                <f:section title="上传崩溃日志">
                     <f:entry title="">
-                    <input type="file" name="file.dsym" size="200"/>
-                    </f:entry>
-                     <f:entry title="">
+                        <input type="file" name="file.dsym" size="200"/>
                     </f:entry>
                     <f:entry title="">
-                    <f:submit value="开始解析"/>
+                        <f:submit value="开始解析"/>
                     </f:entry>
                 </f:section> 
             </f:form>
@@ -42,7 +40,25 @@
                 <div>
                     Interested in becoming a contributor? Please contact to lijia@huajiao.tv.
                 </div>
-            </j:if>              
+            </j:if>
+
+            <j:set var="versionNum" value="${request.getParameter('versionNum')}"/>
+            <f:section title="搜索崩溃日志">
+                <f:entry title="">
+                    <form method="post" action="search" >
+                        输入版本号: <input name="versionNum" type="text" value="${versionNum}"/> <input type="submit" value="搜索"/>
+                    </form>
+                    <br/>
+                    <j:if test="${it.searchDsymLink != null}">                
+                        <a href="${it.searchDsymLink}">${it.searchDsymLink.substring(it.searchDsymLink.lastIndexOf('/') + 1)}</a>
+                    </j:if>
+                    <j:if test="${it.searchDsymLink == null}">                
+                        <div>无法查找</div>
+                    </j:if>
+                </f:entry>
+                
+            </f:section> 
+
         </l:main-panel>
     </l:layout>
 </j:jelly>

@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
+import com.pepper.jenkins.manager.JobDSYMFileManager;
+
 import org.apache.commons.fileupload.FileItem;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
@@ -14,10 +16,13 @@ import hudson.model.Item;
 import hudson.model.Project;
 
 public class ParseSymbolAction implements Action, StaplerProxy {
-	private Project project;
+	private final Project project;
+	private final JobDSYMFileManager dsymFileManager;
+	private String searchDsymLink;
 
-	public ParseSymbolAction(Project project) {
+	public ParseSymbolAction(final Project project) {
 		this.project = project;
+		this.dsymFileManager = new JobDSYMFileManager(this.project);
 	}
 
 	@Override
@@ -43,16 +48,39 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 
 	public void doUpload(final StaplerRequest request, final StaplerResponse response)
 			throws IOException, ServletException {
-		String nextPage = "";
+		final String nextPage = "";
 		final FileItem fileItem = request.getFileItem("file.dsym");
+		if (null != fileItem) {
+
+		}
 		// System.out.println(fileItem.getString("utf8"));
 		execute(request, response, nextPage);
 	}
 
+	public void doSearch(final StaplerRequest request, final StaplerResponse response)
+			throws IOException, ServletException {
+		final String versionNumStr = getRequestParameter(request, "versionNum");
+		final int versionNum = Integer.parseInt(versionNumStr.trim());
+		this.searchDsymLink = this.dsymFileManager.findDsymLink(versionNum);
+		execute(request, response, "");
+	}
+
 	private void execute(final StaplerRequest request, final StaplerResponse response, final String nextPage)
 			throws IOException, ServletException {
-		String url = request.getContextPath() + "/" + getUrlName() + nextPage;
+		final String url = this.project.getAbsoluteUrl() + this.getUrlName() + nextPage;
 		response.sendRedirect(url);
+	}
+
+	private static String getRequestParameter(final StaplerRequest request, final String key) throws ServletException {
+		return request.getSubmittedForm().getString(key);
+	}
+
+	public String getSearchDsymLink() {
+		return searchDsymLink;
+	}
+
+	public void setSearchDsymLink(String searchDsymLink) {
+		this.searchDsymLink = searchDsymLink;
 	}
 
 }
