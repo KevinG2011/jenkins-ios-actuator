@@ -50,7 +50,6 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
 
     @Override
     public File process() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

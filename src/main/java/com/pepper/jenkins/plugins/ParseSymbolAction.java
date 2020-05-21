@@ -64,7 +64,6 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 		if (null != fileItem) {
 
 		}
-		// System.out.println(fileItem.getString("utf8"));
 		execute(request, response, nextPage);
 	}
 
