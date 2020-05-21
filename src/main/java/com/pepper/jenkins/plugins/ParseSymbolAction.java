@@ -16,23 +16,34 @@ import hudson.model.Item;
 import hudson.model.Project;
 
 public class ParseSymbolAction implements Action, StaplerProxy {
-	private final Project project;
-	private final JobDSYMFileManager dsymFileManager;
+	private Project project;
+	private JobDSYMFileManager dsymFileManager;
 	private String searchDsymLink;
 
-	public ParseSymbolAction(final Project project) {
+	public ParseSymbolAction() {
+		this.dsymFileManager = new JobDSYMFileManager();
+	}
+
+	public void setProject(Project project) {
 		this.project = project;
-		this.dsymFileManager = new JobDSYMFileManager(this.project);
+		this.dsymFileManager.setProject(project);
+	}
+
+	public Project getProject() {
+		return project;
 	}
 
 	@Override
 	public String getIconFileName() {
-		return this.project.hasPermission(Item.CONFIGURE) ? "clock.gif" : null;
+		if (this.project != null) {
+			return this.project.hasPermission(Item.CONFIGURE) ? "clock.gif" : null;
+		}
+		return null;
 	}
 
 	@Override
 	public String getDisplayName() {
-		return "在线解析崩溃日志";
+		return "解析崩溃日志";
 	}
 
 	@Override

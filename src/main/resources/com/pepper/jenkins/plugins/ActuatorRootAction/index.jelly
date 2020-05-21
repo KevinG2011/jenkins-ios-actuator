@@ -11,7 +11,7 @@
   <l:layout title="Actuator">
     <l:header title='花椒控制中心'></l:header>
     <l:main-panel>
-      <h1>花椒控制中心</h1>
+      <h1>花椒监控中心</h1>
 
 
       <h3>本机状态信息</h3>

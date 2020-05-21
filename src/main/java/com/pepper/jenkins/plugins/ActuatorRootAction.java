@@ -24,8 +24,6 @@ public class ActuatorRootAction implements RootAction {
     }
 
     public String getFreeDiskSpaceDetail() {
-        String freeDiskSpaceDetail = ActuatorDiskUtils.getFreeDiskSpaceDetail();
-        System.out.println(freeDiskSpaceDetail);
-        return freeDiskSpaceDetail;
+        return ActuatorDiskUtils.getFreeDiskSpaceDetail();
     }
 }

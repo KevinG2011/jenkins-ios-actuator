@@ -11,7 +11,7 @@ import jenkins.model.TransientActionFactory;
 
 @Extension
 public class ParseSymbolActionFactory extends TransientActionFactory<Project> {
-    private static ParseSymbolAction symbolAction;
+    private static ParseSymbolAction symbolAction = new ParseSymbolAction();
 
     @Override
     public Class<Project> type() {
@@ -20,9 +20,8 @@ public class ParseSymbolActionFactory extends TransientActionFactory<Project> {
 
     @Override
     public Collection<? extends Action> createFor(Project project) {
-        System.out.println(project.getAbsoluteUrl());
-        if (null == symbolAction) {
-            symbolAction = new ParseSymbolAction(project);
+        if (symbolAction != null) {
+            symbolAction.setProject(project);
         }
         return singleton(symbolAction);
     }
