@@ -19,6 +19,7 @@ public class ParseSymbolActionFactory extends TransientActionFactory<Project> {
 
     @Override
     public Collection<? extends Action> createFor(Project project) {
+        System.out.println(project.getRootDir());
         return singleton(new ParseSymbolAction(project));
     }
 

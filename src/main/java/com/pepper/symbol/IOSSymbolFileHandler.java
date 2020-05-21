@@ -1,55 +1,52 @@
 package com.pepper.symbol;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.fileupload.FileItem;
+
 public class IOSSymbolFileHandler implements ISymbolFileHandler {
-    private String keyword;
-    private String regex;
-    private File file;
-    private CharSequence cs;
+    public static final String SIGNATURE = "com.huajiao.seeding";
+    public static final String REGEX_PATTERN = "Version:\\s+\\d{10}";
+    public static final Pattern pattern = Pattern.compile(SIGNATURE);
+    private final String content;
+    private String identifier;
+    private String destPath;
 
-    public IOSSymbolFileHandler(File file, String keyword, String regex) {
-        this.file = file;
-        this.keyword = keyword;
-        this.regex = regex;
-        this.cs = this.charSequenceOf();
-    }
-
-    private CharSequence charSequenceOf() {
-        try (FileInputStream fis = new FileInputStream(this.file)) {
-            FileChannel fc = fis.getChannel();
-            ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int) fc.size());
-            CharBuffer cbuf = StandardCharsets.UTF_8.newDecoder().decode(bbuf);
-            return cbuf;
-        } catch (Exception e) {
-            System.err.println("thrown exception: " + e.toString());
-        }
-        return null;
-    }
-
-    @Override
-    public boolean hasValidKeyword() throws IOException {
-        final Pattern pattern = Pattern.compile(keyword);
+    public static boolean isVaildContent(CharSequence cs) {
         Matcher matcher = pattern.matcher(cs);
         return matcher.find();
     }
 
+    public static IOSSymbolFileHandler of(FileItem item) {
+        final String content = item.getString();
+        return IOSSymbolFileHandler.of(content);
+    }
+
+    public static IOSSymbolFileHandler of(String content) {
+        boolean isVaild = IOSSymbolFileHandler.isVaildContent(content);
+        if (isVaild) {
+            return new IOSSymbolFileHandler(content);
+        }
+
+        return null;
+    }
+
+    public IOSSymbolFileHandler(String content) {
+        this.content = content;
+    }
+
     @Override
     public String extractIdentifier() throws IOException {
-        final Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(cs);
+        Pattern pattern = Pattern.compile(REGEX_PATTERN);
+        Matcher matcher = pattern.matcher(this.content);
         if (matcher.find()) {
-            return matcher.group(0);
+            String group = matcher.group(0);
+            this.identifier = group.substring(group.length() - 10);
         }
-        return null;
+        return this.identifier;
     }
 
     @Override

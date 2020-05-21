@@ -13,7 +13,6 @@ import hudson.model.Action;
 import hudson.model.Item;
 import hudson.model.Project;
 
-// @Extension
 public class ParseSymbolAction implements Action, StaplerProxy {
 	private Project project;
 
