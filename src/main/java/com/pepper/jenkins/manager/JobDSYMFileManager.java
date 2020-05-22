@@ -12,7 +12,6 @@ public class JobDSYMFileManager {
     private Project project;
 
     public String findDsymLink(int versionNum) {
-        System.out.println("versionNum :" + versionNum);
         String filePath = String.format("%s/%s/%d/%d-dSYM.zip", this.project.getSomeWorkspace(), ARCHIVE_PATH,
                 versionNum, versionNum);
         Path path = Paths.get(filePath);

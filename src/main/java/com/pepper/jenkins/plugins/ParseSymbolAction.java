@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import com.pepper.jenkins.manager.JobDSYMFileManager;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -69,9 +70,11 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 
 	public void doSearch(final StaplerRequest request, final StaplerResponse response)
 			throws IOException, ServletException {
-		final String versionNumStr = getRequestParameter(request, "versionNum");
-		final int versionNum = Integer.parseInt(versionNumStr.trim());
-		this.searchDsymLink = this.dsymFileManager.findDsymLink(versionNum);
+		final String str = getRequestParameter(request, "versionNum");
+		if (StringUtils.isNotBlank(str) && StringUtils.isNumeric(str)) {
+			final int versionNum = Integer.parseInt(str.trim());
+			this.searchDsymLink = this.dsymFileManager.findDsymLink(versionNum);
+		}
 		execute(request, response, "");
 	}
 

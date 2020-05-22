@@ -34,13 +34,8 @@
                     </f:entry>
                 </f:section> 
             </f:form>
+            <h4>此功能正在开发中...</h4>
             <br/>
-            <j:if test="${uploaded != null}">
-                <h2>功能正在开发中...</h2>
-                <div>
-                    Interested in becoming a contributor? Please contact to lijia@huajiao.tv.
-                </div>
-            </j:if>
 
             <j:set var="versionNum" value="${request.getParameter('versionNum')}"/>
             <f:section title="搜索崩溃日志">
