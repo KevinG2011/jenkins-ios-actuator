@@ -1,11 +1,17 @@
 package com.pepper.symbol;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import org.junit.After;
 import org.junit.Before;
@@ -42,5 +48,22 @@ public class ISymbolFileHandlerTest {
     public void testExtractIdentifier() throws IOException {
         String identifier = this.fileHandler.extractIdentifier();
         assertNotNull(identifier);
+    }
+
+    @Test
+    public void testProcesser() throws IOException {
+        final String wsPath = "/Users/lijia/Downloads/@tmp";
+        List<String> commandLine = Lists.newArrayList("bash", "-c", "ls ~/Downloads/");
+        ProcessBuilder pb = new ProcessBuilder(commandLine);
+        pb.redirectErrorStream(true);
+        File wsDir = new File(wsPath);
+        pb.directory(wsDir);
+        File outputFile = new File(wsPath + "/output.dsym");
+        pb.redirectOutput(Redirect.to(outputFile));
+        Process p = pb.start();
+        assertEquals(pb.redirectInput(), Redirect.PIPE);
+        assertEquals(pb.redirectOutput().file(), outputFile);
+        assertEquals(p.getInputStream().read(), -1);
+        // this.project.getrooten
     }
 }
