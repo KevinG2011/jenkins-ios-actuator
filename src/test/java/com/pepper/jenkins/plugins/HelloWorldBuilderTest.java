@@ -1,11 +1,16 @@
 package com.pepper.jenkins.plugins;
 
-import org.junit.Rule;
-import org.jvnet.hudson.test.JenkinsRule;
+import org.junit.After;
+import org.junit.Before;
 
 public class HelloWorldBuilderTest {
+    @Before
+    public void init() {
+    }
 
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+    @After
+    public void tearDown() throws Exception {
+
+    }
 
 }
