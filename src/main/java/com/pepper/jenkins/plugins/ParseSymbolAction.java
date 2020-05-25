@@ -1,10 +1,11 @@
 package com.pepper.jenkins.plugins;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import com.pepper.jenkins.manager.JobDSYMFileManager;
+import com.pepper.jenkins.manager.DSYMFileManager;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
@@ -18,11 +19,12 @@ import hudson.model.Project;
 
 public class ParseSymbolAction implements Action, StaplerProxy {
 	private Project project;
-	private JobDSYMFileManager dsymFileManager;
+	private DSYMFileManager dsymFileManager;
+	private File dsymbolFile;
 	private String searchDsymLink;
 
 	public ParseSymbolAction() {
-		this.dsymFileManager = new JobDSYMFileManager();
+		this.dsymFileManager = new DSYMFileManager();
 	}
 
 	public void setProject(Project project) {
@@ -58,14 +60,16 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 		return this;
 	}
 
-	public void doUpload(final StaplerRequest request, final StaplerResponse response)
-			throws IOException, ServletException {
+	public void doUpload(final StaplerRequest request, final StaplerResponse response) throws ServletException {
+		this.dsymbolFile = null;
 		final String nextPage = "";
-		final FileItem fileItem = request.getFileItem("file.dsym");
-		if (null != fileItem) {
-
+		try {
+			final FileItem fileItem = request.getFileItem("file.dsym");
+			this.dsymbolFile = this.dsymFileManager.symbolicate(fileItem);
+			execute(request, response, nextPage);
+		} catch (Exception e) {
+			System.err.println(e);
 		}
-		execute(request, response, nextPage);
 	}
 
 	public void doSearch(final StaplerRequest request, final StaplerResponse response)
@@ -92,8 +96,7 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 		return searchDsymLink;
 	}
 
-	public void setSearchDsymLink(String searchDsymLink) {
-		this.searchDsymLink = searchDsymLink;
+	public File getDsymbolFile() {
+		return dsymbolFile;
 	}
-
 }

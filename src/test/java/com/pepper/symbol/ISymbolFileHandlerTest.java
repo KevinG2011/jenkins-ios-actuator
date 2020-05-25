@@ -2,13 +2,10 @@ package com.pepper.symbol;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -19,14 +16,14 @@ import org.junit.Test;
 
 public class ISymbolFileHandlerTest {
     private ISymbolFileHandler fileHandler;
-    private String content;
+    private File file;
 
     @Before
     public void init() throws IOException {
         // String pathStr = "/Users/Loriya/Desktop/CrashReport/crashLog/1_parse.crash";
         String pathStr = "/Users/lijia/Desktop/CrashReport/crashLog/1.crash";
-        this.content = new String(Files.readAllBytes(Paths.get(pathStr)));
-        this.fileHandler = IOSSymbolFileHandler.of(this.content);
+        this.file = new File(pathStr);
+        this.fileHandler = IOSSymbolFileHandler.of(this.file);
     }
 
     @After
@@ -36,12 +33,6 @@ public class ISymbolFileHandlerTest {
     @Test
     public void testInit() {
         assertNotNull(this.fileHandler);
-    }
-
-    @Test
-    public void testIsVaildContent() throws IOException {
-        boolean isValid = IOSSymbolFileHandler.isVaildContent(this.content);
-        assertTrue(isValid);
     }
 
     @Test

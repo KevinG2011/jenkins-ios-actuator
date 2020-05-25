@@ -6,7 +6,7 @@
 -->
 <application generated-by="maven" build-tool-version="3.6.3" plugin-version="1.1.10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.zeroturnaround.com" xsi:schemaLocation="http://www.zeroturnaround.com http://update.zeroturnaround.com/jrebel/rebel-2_2.xsd">
 	<classpath>
-		<dir name="/Users/Loriya/Documents/Project/Jenkins/jenkins-ios-actuator/target/eclipse-classes"></dir>
+		<dir name="/Users/Loriya/Documents/Project/Jenkins/ios-actuator/target/eclipse-classes"></dir>
 	</classpath>
 
 </application>
