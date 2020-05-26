@@ -49,10 +49,9 @@ public class ISymbolFileHandlerTest {
     }
 
     @Test
-    public void testProcesser() throws IOException {
+    public void testProcesser() throws Exception {
         File dsymbolFile = this.fileHandler.process();
         assertTrue(dsymbolFile.exists());
         // this.project.getrooten
     }
-
 }

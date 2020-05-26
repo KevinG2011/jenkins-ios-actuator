@@ -66,6 +66,7 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 		try {
 			final FileItem fileItem = request.getFileItem("file.dsym");
 			this.symbolResult = this.dsymFileManager.symbolicate(fileItem);
+			this.dsymFileManager.cleanUpCrashFiles();
 			execute(request, response, nextPage);
 		} catch (Exception e) {
 			System.err.println(e);
