@@ -22,7 +22,64 @@ import hudson.model.Project;
 public class DSYMFileManager {
     public static final String WORKSPACE_FOLDER = "ws";
     public static final String ARCHIVE_FOLDER = "archive";
+    public static final String CRASH_FOLDER = "crash";
     private Project project;
+
+    private Path getWorkspaceTmpDirectory() {
+        Path wsTmpPath = null;
+        try {
+            String wsTmpPathname = String.format("%s@tmp", this.project.getSomeWorkspace());
+            wsTmpPath = Paths.get(wsTmpPathname);
+            if (Files.exists(wsTmpPath, LinkOption.NOFOLLOW_LINKS)
+                    && !Files.isDirectory(wsTmpPath, LinkOption.NOFOLLOW_LINKS)) {
+                FileUtils.deleteDirectory(wsTmpPath.toFile());
+            }
+            Files.createDirectory(wsTmpPath);
+        } catch (IOException e) {
+            System.err.println(e.getLocalizedMessage());
+        }
+        return wsTmpPath;
+    }
+
+    private Path getTmpCrashDirectory() {
+        Path tmpCrashPath = null;
+        try {
+            Path wsTmpPath = this.getWorkspaceTmpDirectory();
+            tmpCrashPath = wsTmpPath.resolve(CRASH_FOLDER);
+            if (Files.exists(tmpCrashPath, LinkOption.NOFOLLOW_LINKS)
+                    && !Files.isDirectory(tmpCrashPath, LinkOption.NOFOLLOW_LINKS)) {
+                FileUtils.deleteDirectory(tmpCrashPath.toFile());
+            }
+
+            Files.createDirectory(tmpCrashPath);
+        } catch (IOException e) {
+            System.err.println(e.getLocalizedMessage());
+        }
+        return tmpCrashPath;
+    }
+
+    private String getWorkspaceTmpUrl() {
+        String wsTmpRemoteUrl = null;
+        Path path = this.getWorkspaceTmpDirectory();
+        if (Files.exists(path)) {
+            wsTmpRemoteUrl = String.format("%s/%s@tmp", this.project.getAbsoluteUrl(), WORKSPACE_FOLDER);
+        }
+        return wsTmpRemoteUrl;
+    }
+
+    private String getWorkspaceTmpCrashUrl() {
+        String wsTmpUrl = this.getWorkspaceTmpUrl();
+        this.getTmpCrashDirectory();
+        String tmpCrashUrl = String.format("%s/%s", wsTmpUrl, CRASH_FOLDER);
+        return tmpCrashUrl;
+    }
+
+    private String getWorkspaceTmpCrashSymbolFileUrl(String filename) {
+        String tmpCrashUrl = this.getWorkspaceTmpCrashUrl();
+        String symbolFileUrl = String.format("%s/%s", tmpCrashUrl, filename);
+        System.out.println("symbolFileUrl :" + symbolFileUrl);
+        return symbolFileUrl;
+    }
 
     public Path findDSYMLocalPath(int versionNum) {
         String versionName = String.valueOf(versionNum);
@@ -35,7 +92,7 @@ public class DSYMFileManager {
     public String findDSYMRemoteUrl(int versionNum) {
         Path path = this.findDSYMLocalPath(versionNum);
         String dsymRemoteUrl = null;
-        if (Files.exists(path)) {
+        if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
             dsymRemoteUrl = String.format("%s/%s/%s/%d/%d-dSYM.zip", this.project.getAbsoluteUrl(), WORKSPACE_FOLDER,
                     ARCHIVE_FOLDER, versionNum, versionNum);
         }
@@ -46,8 +103,6 @@ public class DSYMFileManager {
 
     public SymbolicateResult symbolicate(FileItem fileItem) {
         SymbolicateResult sr = new SymbolicateResult();
-        sr.setStatusCode(0);
-
         try {
             Path tmpCrashPath = this.getTmpCrashDirectory();
             Path inputPath = tmpCrashPath.resolve(fileItem.getName());
@@ -84,10 +139,16 @@ public class DSYMFileManager {
                     sr.setDesc("DSYM文件获取失败");
                     break;
                 }
-
+                // 设置DSYM路径
                 handler.setDsymPathname(dsymPath.toString());
+                // 解析文件
                 File dsymbolFile = handler.process();
-                sr.setDsymbolFile(dsymbolFile);
+                // 设置符号化文件
+                sr.setFile(dsymbolFile);
+                // 设置符号化文件Url
+                if (dsymbolFile != null) {
+                    sr.setFileUrl(this.getWorkspaceTmpCrashSymbolFileUrl(dsymbolFile.getName()));
+                }
             } while (false);
         } catch (Exception e) {
             System.err.println(e);
@@ -96,16 +157,6 @@ public class DSYMFileManager {
         }
 
         return sr;
-    }
-
-    private Path getTmpCrashDirectory() throws IOException {
-        String wsTmpPathname = String.format("%s@tmp", this.project.getSomeWorkspace());
-        Path tmpCrashPath = Paths.get(wsTmpPathname, "crash");
-        if (!Files.isDirectory(tmpCrashPath, LinkOption.NOFOLLOW_LINKS)) {
-            Files.deleteIfExists(tmpCrashPath);
-            Files.createDirectory(tmpCrashPath);
-        }
-        return tmpCrashPath;
     }
 
     public void cleanUpCrashFiles() {

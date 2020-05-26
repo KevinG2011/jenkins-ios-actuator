@@ -5,7 +5,15 @@ import java.io.File;
 public class SymbolicateResult {
     private int statusCode;
     private String desc;
-    private File dsymbolFile;
+    private File file;
+    private String fileUrl;
+
+    public SymbolicateResult() {
+        this.statusCode = 0;
+        this.desc = null;
+        this.file = null;
+        this.fileUrl = null;
+    }
 
     public int getStatusCode() {
         return statusCode;
@@ -23,12 +31,20 @@ public class SymbolicateResult {
         this.desc = desc;
     }
 
-    public File getDsymbolFile() {
-        return dsymbolFile;
+    public File getFile() {
+        return file;
     }
 
-    public void setDsymbolFile(File dsymbolFile) {
-        this.dsymbolFile = dsymbolFile;
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 
 }

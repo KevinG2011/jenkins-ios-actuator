@@ -22,7 +22,7 @@
             </j:invoke>
   -->        
             <h1>崩溃日志解析</h1> 
-            <j:set var="instance" value="${it}"/>
+            <j:set var="sr" value="${it.symbolResult}"/>
             <j:set var="uploaded" value="${request.getParameter('uploaded')}"/>                            
             <f:form method="post" action="upload" name="upload" enctype="multipart/form-data">
                <f:section title="上传崩溃日志">
@@ -33,8 +33,16 @@
                         <f:submit value="开始解析"/>
                     </f:entry>
                 </f:section> 
+
+               <f:section title="解析结果">
+                    <j:if test="${sr.fileUrl != null}">                
+                        <a href="${sr.fileUrl}">${sr.file.name}</a>
+                    </j:if>
+                    <j:if test="${sr.desc != null}">                
+                        <div>${sr.desc}</div>
+                    </j:if>
+                </f:section>
             </f:form>
-            <h4>此功能正在开发中...</h4>
             <br/>
 
             <j:set var="versionNum" value="${request.getParameter('versionNum')}"/>
