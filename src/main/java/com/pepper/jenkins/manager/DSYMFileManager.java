@@ -20,9 +20,9 @@ import org.apache.commons.lang.StringUtils;
 import hudson.model.Project;
 
 public class DSYMFileManager {
-    public static final String WORKSPACE_FOLDER = "ws";
-    public static final String ARCHIVE_FOLDER = "archive";
-    public static final String CRASH_FOLDER = "crash";
+    public static final String WORKSPACE_DIR = "ws";
+    public static final String ARCHIVE_DIR = "archive";
+    public static final String CRASH_DIR = "crash";
     private Project project;
 
     private Path getWorkspaceTmpDirectory() {
@@ -45,7 +45,7 @@ public class DSYMFileManager {
         Path tmpCrashPath = null;
         try {
             Path wsTmpPath = this.getWorkspaceTmpDirectory();
-            tmpCrashPath = wsTmpPath.resolve(CRASH_FOLDER);
+            tmpCrashPath = wsTmpPath.resolve(CRASH_DIR);
             if (Files.exists(tmpCrashPath, LinkOption.NOFOLLOW_LINKS)
                     && !Files.isDirectory(tmpCrashPath, LinkOption.NOFOLLOW_LINKS)) {
                 FileUtils.deleteDirectory(tmpCrashPath.toFile());
@@ -62,7 +62,7 @@ public class DSYMFileManager {
         String wsTmpRemoteUrl = null;
         Path path = this.getWorkspaceTmpDirectory();
         if (Files.exists(path)) {
-            wsTmpRemoteUrl = String.format("%s/%s@tmp", this.project.getAbsoluteUrl(), WORKSPACE_FOLDER);
+            wsTmpRemoteUrl = String.format("%s/%s@tmp", this.project.getAbsoluteUrl(), WORKSPACE_DIR);
         }
         return wsTmpRemoteUrl;
     }
@@ -70,7 +70,7 @@ public class DSYMFileManager {
     private String getWorkspaceTmpCrashUrl() {
         String wsTmpUrl = this.getWorkspaceTmpUrl();
         this.getTmpCrashDirectory();
-        String tmpCrashUrl = String.format("%s/%s", wsTmpUrl, CRASH_FOLDER);
+        String tmpCrashUrl = String.format("%s/%s", wsTmpUrl, CRASH_DIR);
         return tmpCrashUrl;
     }
 
@@ -85,7 +85,7 @@ public class DSYMFileManager {
         String versionName = String.valueOf(versionNum);
         String fileName = String.format("%d-dSYM.zip", versionNum);
         String workspaceName = this.project.getSomeWorkspace().getRemote();
-        Path path = Paths.get(workspaceName, ARCHIVE_FOLDER, versionName, fileName);
+        Path path = Paths.get(workspaceName, ARCHIVE_DIR, versionName, fileName);
         return path;
     }
 
@@ -93,8 +93,8 @@ public class DSYMFileManager {
         Path path = this.findDSYMLocalPath(versionNum);
         String dsymRemoteUrl = null;
         if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-            dsymRemoteUrl = String.format("%s/%s/%s/%d/%d-dSYM.zip", this.project.getAbsoluteUrl(), WORKSPACE_FOLDER,
-                    ARCHIVE_FOLDER, versionNum, versionNum);
+            dsymRemoteUrl = String.format("%s/%s/%s/%d/%d-dSYM.zip", this.project.getAbsoluteUrl(), WORKSPACE_DIR,
+                    ARCHIVE_DIR, versionNum, versionNum);
         }
 
         System.out.println("dsymRemoteUrl : " + dsymRemoteUrl);
