@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
 import com.pepper.symbol.IOSSymbolFileHandler;
@@ -23,6 +24,7 @@ public class DSYMFileManager {
     public static final String WORKSPACE_DIR = "ws";
     public static final String ARCHIVE_DIR = "archive";
     public static final String CRASH_DIR = "crash";
+    public static final String SYMBOL_DIR = "symbol";
     private Project project;
 
     private Path getWorkspaceTmpDirectory() {
@@ -39,6 +41,21 @@ public class DSYMFileManager {
             System.err.println(e.getLocalizedMessage());
         }
         return wsTmpPath;
+    }
+
+    private Path getWorkspaceSymbolDirectory() {
+        Path wsSymbolPath = null;
+        try {
+            wsSymbolPath = Paths.get(this.project.getSomeWorkspace().getRemote(), SYMBOL_DIR);
+            if (Files.exists(wsSymbolPath, LinkOption.NOFOLLOW_LINKS)
+                    && !Files.isDirectory(wsSymbolPath, LinkOption.NOFOLLOW_LINKS)) {
+                FileUtils.deleteDirectory(wsSymbolPath.toFile());
+            }
+            Files.createDirectory(wsSymbolPath);
+        } catch (IOException e) {
+            System.err.println(e.getLocalizedMessage());
+        }
+        return wsSymbolPath;
     }
 
     private Path getTmpCrashDirectory() {
@@ -58,25 +75,21 @@ public class DSYMFileManager {
         return tmpCrashPath;
     }
 
-    private String getWorkspaceTmpUrl() {
-        String wsTmpRemoteUrl = null;
-        Path path = this.getWorkspaceTmpDirectory();
-        if (Files.exists(path)) {
-            wsTmpRemoteUrl = String.format("%s/%s@tmp", this.project.getAbsoluteUrl(), WORKSPACE_DIR);
-        }
-        return wsTmpRemoteUrl;
+    private String getWorkspaceUrl() {
+        String wsUrl = String.format("%s/%s", this.project.getAbsoluteUrl(), WORKSPACE_DIR);
+        return wsUrl;
     }
 
-    private String getWorkspaceTmpCrashUrl() {
-        String wsTmpUrl = this.getWorkspaceTmpUrl();
-        this.getTmpCrashDirectory();
-        String tmpCrashUrl = String.format("%s/%s", wsTmpUrl, CRASH_DIR);
-        return tmpCrashUrl;
+    private String getWorkspaceSymbolUrl() {
+        String wsUrl = this.getWorkspaceUrl();
+        this.getWorkspaceSymbolDirectory();
+        String wsSymbolUrl = String.format("%s/%s", wsUrl, SYMBOL_DIR);
+        return wsSymbolUrl;
     }
 
-    private String getWorkspaceTmpCrashSymbolFileUrl(String filename) {
-        String tmpCrashUrl = this.getWorkspaceTmpCrashUrl();
-        String symbolFileUrl = String.format("%s/%s", tmpCrashUrl, filename);
+    private String getWorkspaceSymbolFileUrl(String filename) {
+        String wsSymbolUrl = this.getWorkspaceSymbolUrl();
+        String symbolFileUrl = String.format("%s/%s", wsSymbolUrl, filename);
         System.out.println("symbolFileUrl :" + symbolFileUrl);
         return symbolFileUrl;
     }
@@ -142,12 +155,16 @@ public class DSYMFileManager {
                 // 设置DSYM路径
                 handler.setDsymPathname(dsymPath.toString());
                 // 解析文件
-                File dsymbolFile = handler.process();
+                File symbolicFile = handler.process();
                 // 设置符号化文件
-                sr.setFile(dsymbolFile);
+                sr.setFile(symbolicFile);
                 // 设置符号化文件Url
-                if (dsymbolFile != null) {
-                    sr.setFileUrl(this.getWorkspaceTmpCrashSymbolFileUrl(dsymbolFile.getName()));
+                if (symbolicFile != null) {
+                    String filename = symbolicFile.getName();
+                    Path targetPath = this.getWorkspaceSymbolDirectory().resolve(filename);
+                    // 移动符号化后的文件到symbol文件夹
+                    Files.move(symbolicFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    sr.setFileUrl(this.getWorkspaceSymbolFileUrl(filename));
                 }
             } while (false);
         } catch (Exception e) {

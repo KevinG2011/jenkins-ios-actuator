@@ -2,7 +2,6 @@ package com.pepper.symbol;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,7 +31,7 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
         return matcher.find();
     }
 
-    public static IOSSymbolFileHandler of(File file) throws UnsupportedEncodingException, IOException {
+    public static IOSSymbolFileHandler of(File file) throws IOException {
         Path path = Paths.get(file.getAbsolutePath());
         String fileContent = new String(Files.readAllBytes(path), "utf-8");
         boolean isVaild = IOSSymbolFileHandler.isVaildContent(fileContent);
