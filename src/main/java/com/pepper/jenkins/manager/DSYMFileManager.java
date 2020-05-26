@@ -83,13 +83,20 @@ public class DSYMFileManager {
                 }
                 // 解压到指定目录
                 FileInputStream fis = new FileInputStream(dsymLocalPath.toFile());
-                ZipUtils.unzip(fis, wsTmpPath);
+                Path dsymPath = ZipUtils.unzipDSYM(fis, wsTmpPath);
+                if (null == dsymPath) {
+                    sr.setDesc("DSYM文件获取失败");
+                    break;
+                }
 
-                // return handler.process();
+                handler.setDsymPathname(dsymPath.toString());
+                File dsymbolFile = handler.process();
+                sr.setDsymbolFile(dsymbolFile);
             } while (false);
         } catch (Exception e) {
             System.err.println(e);
             sr.setDesc(e.getLocalizedMessage());
+            sr.setStatusCode(-1);
         }
 
         return sr;

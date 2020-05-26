@@ -1,11 +1,11 @@
 package com.pepper.symbol;
 
-import java.nio.file.Path;
+import java.io.File;
 
 public class SymbolicateResult {
     private int statusCode;
     private String desc;
-    private Path dsymbolPath;
+    private File dsymbolFile;
 
     public int getStatusCode() {
         return statusCode;
@@ -23,12 +23,12 @@ public class SymbolicateResult {
         this.desc = desc;
     }
 
-    public Path getDsymbolPath() {
-        return dsymbolPath;
+    public File getDsymbolFile() {
+        return dsymbolFile;
     }
 
-    public void setDsymbolPath(Path dsymbolPath) {
-        this.dsymbolPath = dsymbolPath;
+    public void setDsymbolFile(File dsymbolFile) {
+        this.dsymbolFile = dsymbolFile;
     }
 
 }

@@ -20,7 +20,6 @@ public class ParseSymbolActionFactory extends TransientActionFactory<Project> {
 
     @Override
     public Collection<? extends Action> createFor(Project project) {
-        System.out.println(symbolAction);
         if (symbolAction != null) {
             symbolAction.setProject(project);
         }

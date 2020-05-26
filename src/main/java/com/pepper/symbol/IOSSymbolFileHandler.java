@@ -60,7 +60,7 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
     }
 
     @Override
-    public File process() throws IOException {
+    public File process() throws IOException, InterruptedException {
         String inputPathname = this.file.getPath();
         IOSSymbolCommand cmd = new IOSSymbolCommand(inputPathname, this.dsymPathname);
         List<String> commandLine = Lists.newArrayList("bash", "-c", cmd.command());
@@ -78,8 +78,9 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
         File dsymbolFile = null;
         try {
             process = pb.start();
+            process.waitFor();
             dsymbolFile = pb.redirectOutput().file();
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw e;
         } finally {
             if (null != process) {
