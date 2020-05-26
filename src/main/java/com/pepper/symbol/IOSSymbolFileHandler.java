@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 
+import org.apache.commons.io.FilenameUtils;
+
 public class IOSSymbolFileHandler implements ISymbolFileHandler {
 
     public static final Pattern pattern = Pattern.compile(IOSSymbolConstants.SIGNATURE);
@@ -20,8 +22,10 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
     private File file;
     private String fileContent;
     private String identifier;
+
+    private String dsymPathname;
     private String outputDir;
-    private String outputFileName;
+    private String outputPathname;
 
     public static boolean isVaildContent(CharSequence cs) {
         Matcher matcher = pattern.matcher(cs);
@@ -57,31 +61,48 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
 
     @Override
     public File process() throws IOException {
-        List<String> commandLine = Lists.newArrayList("bash", "-c", "ls ~/Downloads/");
+        String inputPathname = this.file.getPath();
+        IOSSymbolCommand cmd = new IOSSymbolCommand(inputPathname, this.dsymPathname);
+        List<String> commandLine = Lists.newArrayList("bash", "-c", cmd.command());
         ProcessBuilder pb = new ProcessBuilder(commandLine);
-        File outputFile = new File(this.outputDir);
+        File outputFile = new File(this.getOutputDir());
         pb.directory(outputFile);
         pb.redirectErrorStream(true);
-        String outputPathname = Paths.get(outputDir, this.outputFileName).toString();
+
+        String fullPathname = FilenameUtils.getFullPath(inputPathname);
+        String outputFilename = FilenameUtils.getBaseName(inputPathname) + ".txt";
+        this.outputPathname = FilenameUtils.concat(fullPathname, outputFilename);
         File output = new File(outputPathname);
         pb.redirectOutput(Redirect.to(output));
-        pb.start();
-        return pb.redirectOutput().file();
+        Process process = null;
+        File dsymbolFile = null;
+        try {
+            process = pb.start();
+            dsymbolFile = pb.redirectOutput().file();
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (null != process) {
+                process.destroy();
+                process = null;
+            }
+        }
+        return dsymbolFile;
     }
 
     public String getOutputDir() {
-        return outputDir;
+        if (null == this.outputDir) {
+            this.outputDir = FilenameUtils.getFullPath(this.file.getPath());
+        }
+        return this.outputDir;
     }
 
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }
 
-    public String getOutputFileName() {
-        return outputFileName;
+    public void setDsymPathname(String dsymPathname) {
+        this.dsymPathname = dsymPathname;
     }
 
-    public void setOutputFileName(String outputFileName) {
-        this.outputFileName = outputFileName;
-    }
 }

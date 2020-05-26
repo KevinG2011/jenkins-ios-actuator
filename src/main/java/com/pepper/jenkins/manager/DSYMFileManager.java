@@ -20,7 +20,6 @@ public class DSYMFileManager {
     public static final String WORKSPACE_NAME = "ws";
     public static final String ARCHIVE_NAME = "archive";
     public static final String INPUT_NAME = "input.crash";
-    public static final String OUTPUT_NAME = "output.txt";
     private Project project;
 
     public Path findDSYMLocalPath(int versionNum) {
@@ -65,7 +64,6 @@ public class DSYMFileManager {
                     break;
                 }
                 handler.setOutputDir(workspaceTmp);
-                handler.setOutputFileName(OUTPUT_NAME);
 
                 String versionNum = handler.extractIdentifier();
                 if (StringUtils.isBlank(versionNum)) {
