@@ -25,15 +25,16 @@ public class ZipUtilityTest {
 
     @Test
     public void testUnZip() {
-        String zipname = "/Users/Loriya/Downloads/jetbrains-agent.zip";
-        String target = "/Users/Loriya/Downloads/test@tmp";
-        File file = new File(zipname);
-        assertTrue(file.canRead());
+        String target = "/Users/lijia/Desktop/CrashReport/build";
         Path targetPath = Paths.get(target);
+        Path zipPath = targetPath.resolve("2517-dSYM.zip");
+        File file = zipPath.toFile();
+        assertTrue(file.canRead());
         try {
             InputStream is = new FileInputStream(file);
             ZipUtils.unzip(is, targetPath);
         } catch (Exception e) {
+            System.err.println(e.getLocalizedMessage());
             fail("Should not have thrown any exception");
         }
 

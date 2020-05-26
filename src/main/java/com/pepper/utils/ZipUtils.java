@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -20,7 +21,7 @@ public class ZipUtils {
                     Files.createDirectories(resolvedPath);
                 } else {
                     Files.createDirectories(resolvedPath.getParent());
-                    Files.copy(zipIn, resolvedPath);
+                    Files.copy(zipIn, resolvedPath, StandardCopyOption.REPLACE_EXISTING);
                 }
             }
         }

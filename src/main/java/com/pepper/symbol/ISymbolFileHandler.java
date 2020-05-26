@@ -8,5 +8,5 @@ public interface ISymbolFileHandler {
     String extractIdentifier() throws IOException;
 
     // 解析文件
-    File process();
+    File process() throws IOException;
 }

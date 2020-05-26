@@ -2,6 +2,7 @@ package com.pepper.symbol;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,17 +28,12 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
         return matcher.find();
     }
 
-    public static IOSSymbolFileHandler of(File file) {
+    public static IOSSymbolFileHandler of(File file) throws UnsupportedEncodingException, IOException {
         Path path = Paths.get(file.getAbsolutePath());
-        try {
-            String fileContent = new String(Files.readAllBytes(path), "utf-8");
-            boolean isVaild = IOSSymbolFileHandler.isVaildContent(fileContent);
-            if (isVaild) {
-                return new IOSSymbolFileHandler(file, fileContent);
-            }
-
-        } catch (Exception e) {
-            System.err.println(e);
+        String fileContent = new String(Files.readAllBytes(path), "utf-8");
+        boolean isVaild = IOSSymbolFileHandler.isVaildContent(fileContent);
+        if (isVaild) {
+            return new IOSSymbolFileHandler(file, fileContent);
         }
 
         return null;
@@ -60,26 +56,17 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
     }
 
     @Override
-    public File process() {
-        if (this.file.exists()) {
-            List<String> commandLine = Lists.newArrayList("bash", "-c", "ls ~/Downloads/");
-            ProcessBuilder pb = new ProcessBuilder(commandLine);
-            File outputFile = new File(this.outputDir);
-            pb.directory(outputFile);
-            pb.redirectErrorStream(true);
-            String outputPathname = Paths.get(outputDir, this.outputFileName).toString();
-            File output = new File(outputPathname);
-            pb.redirectOutput(Redirect.to(output));
-            try {
-                pb.start();
-
-                return pb.redirectOutput().file();
-            } catch (IOException e) {
-                System.err.println(e);
-            }
-        }
-
-        return null;
+    public File process() throws IOException {
+        List<String> commandLine = Lists.newArrayList("bash", "-c", "ls ~/Downloads/");
+        ProcessBuilder pb = new ProcessBuilder(commandLine);
+        File outputFile = new File(this.outputDir);
+        pb.directory(outputFile);
+        pb.redirectErrorStream(true);
+        String outputPathname = Paths.get(outputDir, this.outputFileName).toString();
+        File output = new File(outputPathname);
+        pb.redirectOutput(Redirect.to(output));
+        pb.start();
+        return pb.redirectOutput().file();
     }
 
     public String getOutputDir() {

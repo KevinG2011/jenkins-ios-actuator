@@ -1,11 +1,11 @@
 package com.pepper.jenkins.plugins;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 
 import com.pepper.jenkins.manager.DSYMFileManager;
+import com.pepper.symbol.SymbolicateResult;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
@@ -20,7 +20,7 @@ import hudson.model.Project;
 public class ParseSymbolAction implements Action, StaplerProxy {
 	private Project project;
 	private DSYMFileManager dsymFileManager;
-	private File dsymbolFile;
+	private SymbolicateResult symbolResult;
 	private String searchDsymLink;
 
 	public ParseSymbolAction() {
@@ -61,11 +61,11 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 	}
 
 	public void doUpload(final StaplerRequest request, final StaplerResponse response) throws ServletException {
-		this.dsymbolFile = null;
+		this.symbolResult = null;
 		final String nextPage = "";
 		try {
 			final FileItem fileItem = request.getFileItem("file.dsym");
-			this.dsymbolFile = this.dsymFileManager.symbolicate(fileItem);
+			this.symbolResult = this.dsymFileManager.symbolicate(fileItem);
 			execute(request, response, nextPage);
 		} catch (Exception e) {
 			System.err.println(e);
@@ -77,7 +77,7 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 		final String str = getRequestParameter(request, "versionNum");
 		if (StringUtils.isNotBlank(str) && StringUtils.isNumeric(str)) {
 			final int versionNum = Integer.parseInt(str.trim());
-			this.searchDsymLink = this.dsymFileManager.findDsymLink(versionNum);
+			this.searchDsymLink = this.dsymFileManager.findDSYMRemoteUrl(versionNum);
 		}
 		execute(request, response, "");
 	}
@@ -96,7 +96,7 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 		return searchDsymLink;
 	}
 
-	public File getDsymbolFile() {
-		return dsymbolFile;
+	public SymbolicateResult getSymbolResult() {
+		return symbolResult;
 	}
 }
