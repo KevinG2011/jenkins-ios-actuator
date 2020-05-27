@@ -1,25 +1,28 @@
 package com.pepper.jenkins;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.stream.Stream;
 
-import org.apache.commons.io.FileUtils;
+import com.pepper.jenkins.manager.DSYMFileManager;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class DSYMFileManagerTest {
+    private DSYMFileManager fm;
+
     @Before
-
     public void init() {
-
+        this.fm = new DSYMFileManager();
     }
 
     @After
@@ -27,18 +30,28 @@ public class DSYMFileManagerTest {
     }
 
     @Test
+    public void testGetWorkspaceDirectory() {
+        Path dirPath = fm.getWorkspaceDirectory(DSYMFileManager.SYMBOLIC_DIR);
+        assertTrue(Files.exists(dirPath, LinkOption.NOFOLLOW_LINKS));
+    }
+
+    @Test
+    public void testGetWorkspaceTmpDirectory() {
+        Path dirPath = fm.getWorkspaceTmpDirectory(DSYMFileManager.CRASH_DIR);
+        assertTrue(Files.exists(dirPath, LinkOption.NOFOLLOW_LINKS));
+    }
+
+    @Test
+    public void testGetWorkspacePathSegmentsUrl() {
+        String url = fm.getWorkspacePathSegmentsUrl(DSYMFileManager.SYMBOLIC_DIR);
+        assertNotNull(url);
+    }
+
+    @Test
     public void testCleanupCrash() throws IOException {
-        String pathname = "/Users/lijia/Documents/Project/Jenkins/ios-actuator/work/workspace/test@tmp/crash";
-        Path tmpCrashPath = Paths.get(pathname);
-        try (Stream<Path> paths = Files.walk(tmpCrashPath, 1)) {
-            paths.filter(path -> {
-                return (!path.toString().endsWith("txt"));
-            }).forEach(path -> {
-                System.out.println(path.toString());
-                if (tmpCrashPath.compareTo(path) != 0) {
-                    FileUtils.deleteQuietly(path.toFile());
-                }
-            });
+        try {
+            Thread t = fm.cleanUpCrashFiles();
+            t.join();
         } catch (Exception e) {
             fail();
         }

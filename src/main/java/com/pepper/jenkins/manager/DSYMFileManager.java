@@ -2,11 +2,14 @@ package com.pepper.jenkins.manager;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 import com.pepper.symbol.IOSSymbolFileHandler;
@@ -15,7 +18,9 @@ import com.pepper.utils.ZipUtils;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 import hudson.model.Project;
 
@@ -26,97 +31,88 @@ public class DSYMFileManager {
     public static final String SYMBOLIC_DIR = "symbolic";
     private Project project;
 
-    private Path getWorkspaceTmpDirectory() {
-        Path wsTmpPath = null;
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public Path getWorkspaceDirectory(String... subPaths) {
+        Path dirPath = null;
         try {
-            String wsTmpPathname = String.format("%s@tmp", this.project.getSomeWorkspace());
-            wsTmpPath = Paths.get(wsTmpPathname);
-            if (Files.exists(wsTmpPath, LinkOption.NOFOLLOW_LINKS)
-                    && !Files.isDirectory(wsTmpPath, LinkOption.NOFOLLOW_LINKS)) {
-                FileUtils.deleteDirectory(wsTmpPath.toFile());
+            final String wsPathname = "/Users/lijia/Documents/Project/Jenkins/ios-actuator/work/workspace/test";
+            dirPath = Paths.get(wsPathname, subPaths);
+            String filename = dirPath.getFileName().toString();
+            if (StringUtils.isBlank(FilenameUtils.getExtension(filename))) {
+                Files.createDirectories(dirPath);
             }
-            Files.createDirectory(wsTmpPath);
+        } catch (Exception e) {
+            System.err.println(e.getLocalizedMessage());
+        }
+        return dirPath;
+    }
+
+    public Path getWorkspaceTmpDirectory(String... subPaths) {
+        Path dirPath = null;
+        try {
+            Path wsPath = this.getWorkspaceDirectory();
+            String wsTmpPathname = wsPath.toString() + "@tmp";
+            dirPath = Paths.get(wsTmpPathname, subPaths);
+
+            String filename = dirPath.getFileName().toString();
+            if (StringUtils.isBlank(FilenameUtils.getExtension(filename))) {
+                Files.createDirectories(dirPath);
+            }
         } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
         }
-        return wsTmpPath;
+        return dirPath;
     }
 
-    private Path getWorkspaceSymbolicDirectory() {
-        Path wsSymbolicPath = null;
+    public String getWorkspacePathSegmentsUrl(String... args) {
+        String wsUrl = this.project.getAbsoluteUrl();
+        // String wsUrl = "http://localhost:8080/jenkins/test";
         try {
-            wsSymbolicPath = Paths.get(this.project.getSomeWorkspace().getRemote(), SYMBOLIC_DIR);
-            if (Files.exists(wsSymbolicPath, LinkOption.NOFOLLOW_LINKS)
-                    && !Files.isDirectory(wsSymbolicPath, LinkOption.NOFOLLOW_LINKS)) {
-                FileUtils.deleteDirectory(wsSymbolicPath.toFile());
-            }
-            Files.createDirectory(wsSymbolicPath);
-        } catch (IOException e) {
+            URIBuilder builder = new URIBuilder(wsUrl);
+            List<String> paths = builder.getPathSegments();
+            paths.add(WORKSPACE_DIR);
+            List<String> segments = Arrays.asList(args);
+            paths.addAll(segments);
+            builder.setPathSegments(paths);
+            wsUrl = builder.build().toString();
+        } catch (URISyntaxException e) {
             System.err.println(e.getLocalizedMessage());
+            wsUrl = String.format("%s/%s", this.project.getAbsoluteUrl(), WORKSPACE_DIR);
         }
-        return wsSymbolicPath;
-    }
-
-    private Path getTmpCrashDirectory() {
-        Path tmpCrashPath = null;
-        try {
-            Path wsTmpPath = this.getWorkspaceTmpDirectory();
-            tmpCrashPath = wsTmpPath.resolve(CRASH_DIR);
-            if (Files.exists(tmpCrashPath, LinkOption.NOFOLLOW_LINKS)
-                    && !Files.isDirectory(tmpCrashPath, LinkOption.NOFOLLOW_LINKS)) {
-                FileUtils.deleteDirectory(tmpCrashPath.toFile());
-            }
-
-            Files.createDirectory(tmpCrashPath);
-        } catch (IOException e) {
-            System.err.println(e.getLocalizedMessage());
-        }
-        return tmpCrashPath;
-    }
-
-    private String getWorkspaceUrl() {
-        String wsUrl = String.format("%s/%s", this.project.getAbsoluteUrl(), WORKSPACE_DIR);
         return wsUrl;
     }
 
-    private String getWorkspaceSymbolicUrl() {
-        String wsUrl = this.getWorkspaceUrl();
-        this.getWorkspaceSymbolicDirectory();
-        String wsSymbolicUrl = String.format("%s/%s", wsUrl, SYMBOLIC_DIR);
-        return wsSymbolicUrl;
-    }
-
-    private String getWorkspaceSymbolFileUrl(String filename) {
-        String wsSymbolicUrl = this.getWorkspaceSymbolicUrl();
-        String symbolicFileUrl = String.format("%s/%s", wsSymbolicUrl, filename);
-        System.out.println("symbolFileUrl :" + symbolicFileUrl);
-        return symbolicFileUrl;
-    }
-
     public Path findDSYMLocalPath(int versionNum) {
-        String versionName = String.valueOf(versionNum);
+        String versionStr = String.valueOf(versionNum);
         String fileName = String.format("%d-dSYM.zip", versionNum);
-        String workspaceName = this.project.getSomeWorkspace().getRemote();
-        Path path = Paths.get(workspaceName, ARCHIVE_DIR, versionName, fileName);
-        return path;
+        Path filePath = this.getWorkspaceDirectory(ARCHIVE_DIR, versionStr, fileName);
+        return filePath;
     }
 
     public String findDSYMRemoteUrl(int versionNum) {
         Path path = this.findDSYMLocalPath(versionNum);
-        String dsymRemoteUrl = null;
+        String versionStr = String.valueOf(versionNum);
+        String dsymUrl = null;
         if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-            dsymRemoteUrl = String.format("%s/%s/%s/%d/%d-dSYM.zip", this.project.getAbsoluteUrl(), WORKSPACE_DIR,
-                    ARCHIVE_DIR, versionNum, versionNum);
+            String dsymFilename = String.format("%s-dSYM.zip", versionStr);
+            dsymUrl = this.getWorkspacePathSegmentsUrl(ARCHIVE_DIR, versionStr, dsymFilename);
         }
 
-        System.out.println("dsymRemoteUrl : " + dsymRemoteUrl);
-        return dsymRemoteUrl;
+        System.out.println("dsymUrl : " + dsymUrl);
+        return dsymUrl;
     }
 
     public SymbolicateResult symbolicate(FileItem fileItem) {
         SymbolicateResult sr = new SymbolicateResult();
         try {
-            Path tmpCrashPath = this.getTmpCrashDirectory();
+            Path tmpCrashPath = this.getWorkspaceTmpDirectory(CRASH_DIR);
             Path inputPath = tmpCrashPath.resolve(fileItem.getName());
             Path inputFilePath = Files.write(inputPath, fileItem.get());
             do {
@@ -157,13 +153,14 @@ public class DSYMFileManager {
                 // 设置符号化文件Url
                 if (symbolicPath != null) {
                     Path filenamePath = symbolicPath.getFileName();
-                    Path targetPath = this.getWorkspaceSymbolicDirectory().resolve(filenamePath);
+                    Path targetPath = this.getWorkspaceDirectory(SYMBOLIC_DIR).resolve(filenamePath);
                     // 移动符号化后的文件到symbol文件夹
                     Files.move(symbolicPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                     // 设置符号化文件
                     sr.setFilePath(targetPath);
                     // 设置符号化文件Url
-                    sr.setFileUrl(this.getWorkspaceSymbolFileUrl(filenamePath.toString()));
+                    String fileUrl = this.getWorkspacePathSegmentsUrl(SYMBOLIC_DIR, filenamePath.toString());
+                    sr.setFileUrl(fileUrl);
                 }
             } while (false);
         } catch (Exception e) {
@@ -175,11 +172,11 @@ public class DSYMFileManager {
         return sr;
     }
 
-    public void cleanUpCrashFiles() {
-        new Thread(() -> {
+    public Thread cleanUpCrashFiles() {
+        Thread t = new Thread(() -> {
             Stream<Path> stream = null;
             try {
-                Path tmpCrashPath = this.getTmpCrashDirectory();
+                Path tmpCrashPath = this.getWorkspaceTmpDirectory(CRASH_DIR);
                 stream = Files.walk(tmpCrashPath, 1);
                 stream.filter(path -> (!path.toString().endsWith("txt"))).forEach(path -> {
                     if (tmpCrashPath.compareTo(path) != 0) {
@@ -195,15 +192,9 @@ public class DSYMFileManager {
                 }
             }
 
-        }).start();
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
+        });
+        t.start();
+        return t;
     }
 
 }

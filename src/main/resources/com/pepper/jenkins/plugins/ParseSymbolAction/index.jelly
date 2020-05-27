@@ -36,7 +36,7 @@
 
                <f:section title="解析结果">
                     <j:if test="${sr.fileUrl != null}">                
-                        <a href="${sr.fileUrl}">${sr.file.name}</a>
+                        <a href="${sr.fileUrl}">${sr.filename}</a>
                     </j:if>
                     <j:if test="${sr.desc != null}">                
                         <div>${sr.desc}</div>

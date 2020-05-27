@@ -47,4 +47,8 @@ public class SymbolicateResult {
         this.filePath = filePath;
     }
 
+    public String getFilename() {
+        return this.filePath.getFileName().toString();
+    }
+
 }

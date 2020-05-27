@@ -84,7 +84,7 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 	}
 
 	private void execute(final StaplerRequest request, final StaplerResponse response, final String nextPage)
-			throws IOException, ServletException {
+			throws IOException {
 		final String url = this.project.getAbsoluteUrl() + this.getUrlName() + nextPage;
 		response.sendRedirect(url);
 	}
