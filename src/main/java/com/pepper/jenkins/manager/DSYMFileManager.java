@@ -1,6 +1,5 @@
 package com.pepper.jenkins.manager;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,7 +23,7 @@ public class DSYMFileManager {
     public static final String WORKSPACE_DIR = "ws";
     public static final String ARCHIVE_DIR = "archive";
     public static final String CRASH_DIR = "crash";
-    public static final String SYMBOL_DIR = "symbol";
+    public static final String SYMBOLIC_DIR = "symbolic";
     private Project project;
 
     private Path getWorkspaceTmpDirectory() {
@@ -43,19 +42,19 @@ public class DSYMFileManager {
         return wsTmpPath;
     }
 
-    private Path getWorkspaceSymbolDirectory() {
-        Path wsSymbolPath = null;
+    private Path getWorkspaceSymbolicDirectory() {
+        Path wsSymbolicPath = null;
         try {
-            wsSymbolPath = Paths.get(this.project.getSomeWorkspace().getRemote(), SYMBOL_DIR);
-            if (Files.exists(wsSymbolPath, LinkOption.NOFOLLOW_LINKS)
-                    && !Files.isDirectory(wsSymbolPath, LinkOption.NOFOLLOW_LINKS)) {
-                FileUtils.deleteDirectory(wsSymbolPath.toFile());
+            wsSymbolicPath = Paths.get(this.project.getSomeWorkspace().getRemote(), SYMBOLIC_DIR);
+            if (Files.exists(wsSymbolicPath, LinkOption.NOFOLLOW_LINKS)
+                    && !Files.isDirectory(wsSymbolicPath, LinkOption.NOFOLLOW_LINKS)) {
+                FileUtils.deleteDirectory(wsSymbolicPath.toFile());
             }
-            Files.createDirectory(wsSymbolPath);
+            Files.createDirectory(wsSymbolicPath);
         } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
         }
-        return wsSymbolPath;
+        return wsSymbolicPath;
     }
 
     private Path getTmpCrashDirectory() {
@@ -80,18 +79,18 @@ public class DSYMFileManager {
         return wsUrl;
     }
 
-    private String getWorkspaceSymbolUrl() {
+    private String getWorkspaceSymbolicUrl() {
         String wsUrl = this.getWorkspaceUrl();
-        this.getWorkspaceSymbolDirectory();
-        String wsSymbolUrl = String.format("%s/%s", wsUrl, SYMBOL_DIR);
-        return wsSymbolUrl;
+        this.getWorkspaceSymbolicDirectory();
+        String wsSymbolicUrl = String.format("%s/%s", wsUrl, SYMBOLIC_DIR);
+        return wsSymbolicUrl;
     }
 
     private String getWorkspaceSymbolFileUrl(String filename) {
-        String wsSymbolUrl = this.getWorkspaceSymbolUrl();
-        String symbolFileUrl = String.format("%s/%s", wsSymbolUrl, filename);
-        System.out.println("symbolFileUrl :" + symbolFileUrl);
-        return symbolFileUrl;
+        String wsSymbolicUrl = this.getWorkspaceSymbolicUrl();
+        String symbolicFileUrl = String.format("%s/%s", wsSymbolicUrl, filename);
+        System.out.println("symbolFileUrl :" + symbolicFileUrl);
+        return symbolicFileUrl;
     }
 
     public Path findDSYMLocalPath(int versionNum) {
@@ -120,14 +119,13 @@ public class DSYMFileManager {
             Path tmpCrashPath = this.getTmpCrashDirectory();
             Path inputPath = tmpCrashPath.resolve(fileItem.getName());
             Path inputFilePath = Files.write(inputPath, fileItem.get());
-            File inputFile = inputFilePath.toFile();
             do {
-                IOSSymbolFileHandler handler = IOSSymbolFileHandler.of(inputFile);
+                IOSSymbolFileHandler handler = IOSSymbolFileHandler.of(inputFilePath);
                 if (null == handler) {
                     sr.setDesc("无效的文件内容");
                     break;
                 }
-                handler.setOutputDir(tmpCrashPath.toString());
+                handler.setOutputPath(tmpCrashPath);
 
                 String versionNum = handler.extractIdentifier();
                 if (StringUtils.isBlank(versionNum)) {
@@ -153,18 +151,19 @@ public class DSYMFileManager {
                     break;
                 }
                 // 设置DSYM路径
-                handler.setDsymPathname(dsymPath.toString());
+                handler.setDsymPath(dsymPath);
                 // 解析文件
-                File symbolicFile = handler.process();
-                // 设置符号化文件
-                sr.setFile(symbolicFile);
+                Path symbolicPath = handler.process();
                 // 设置符号化文件Url
-                if (symbolicFile != null) {
-                    String filename = symbolicFile.getName();
-                    Path targetPath = this.getWorkspaceSymbolDirectory().resolve(filename);
+                if (symbolicPath != null) {
+                    Path filenamePath = symbolicPath.getFileName();
+                    Path targetPath = this.getWorkspaceSymbolicDirectory().resolve(filenamePath);
                     // 移动符号化后的文件到symbol文件夹
-                    Files.move(symbolicFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-                    sr.setFileUrl(this.getWorkspaceSymbolFileUrl(filename));
+                    Files.move(symbolicPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    // 设置符号化文件
+                    sr.setFilePath(targetPath);
+                    // 设置符号化文件Url
+                    sr.setFileUrl(this.getWorkspaceSymbolFileUrl(filenamePath.toString()));
                 }
             } while (false);
         } catch (Exception e) {
@@ -182,9 +181,7 @@ public class DSYMFileManager {
             try {
                 Path tmpCrashPath = this.getTmpCrashDirectory();
                 stream = Files.walk(tmpCrashPath, 1);
-                stream.filter(path -> {
-                    return (!path.toString().endsWith("txt"));
-                }).forEach(path -> {
+                stream.filter(path -> (!path.toString().endsWith("txt"))).forEach(path -> {
                     if (tmpCrashPath.compareTo(path) != 0) {
                         FileUtils.deleteQuietly(path.toFile());
                     }

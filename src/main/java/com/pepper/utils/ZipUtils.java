@@ -2,6 +2,7 @@ package com.pepper.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -15,7 +16,7 @@ public class ZipUtils {
 
     public static Path unzipDSYM(InputStream is, Path targetPath) throws IOException {
         Path dsymPath = null;
-        try (ZipInputStream zipIn = new ZipInputStream(is)) {
+        try (ZipInputStream zipIn = new ZipInputStream(is, StandardCharsets.UTF_8)) {
             for (ZipEntry ze; (ze = zipIn.getNextEntry()) != null;) {
                 String entryName = ze.getName();
                 Path resolvedPath = targetPath.resolve(entryName);

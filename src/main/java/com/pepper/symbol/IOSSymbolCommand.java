@@ -3,8 +3,8 @@ package com.pepper.symbol;
 import org.apache.commons.lang.StringUtils;
 
 public class IOSSymbolCommand {
-    public final static String EXPORT_CMD = "export DEVELOPER_DIR=/Applications/XCode.app/Contents/Developer";
-    public final static String BIN = "/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources/symbolicatecrash";
+    public static final String EXPORT_CMD = "export DEVELOPER_DIR=/Applications/XCode.app/Contents/Developer";
+    public static final String BIN = "/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources/symbolicatecrash";
     private String inputName;
     private String dsymName;
 

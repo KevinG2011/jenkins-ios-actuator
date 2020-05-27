@@ -5,45 +5,40 @@ import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 
-import org.apache.commons.io.FilenameUtils;
-
 public class IOSSymbolFileHandler implements ISymbolFileHandler {
 
     public static final Pattern pattern = Pattern.compile(IOSSymbolConstants.SIGNATURE);
 
-    private File file;
-    private String fileContent;
     private String identifier;
+    private String fileContent;
 
-    private String dsymPathname;
-    private String outputDir;
-    private String outputPathname;
+    private Path inputPath;
+    private Path outputPath;
+    private Path dsymPath;
 
     public static boolean isVaildContent(CharSequence cs) {
         Matcher matcher = pattern.matcher(cs);
         return matcher.find();
     }
 
-    public static IOSSymbolFileHandler of(File file) throws IOException {
-        Path path = Paths.get(file.getAbsolutePath());
-        String fileContent = new String(Files.readAllBytes(path), "utf-8");
+    public static IOSSymbolFileHandler of(Path inputPath) throws IOException {
+        String fileContent = new String(Files.readAllBytes(inputPath), "utf-8");
         boolean isVaild = IOSSymbolFileHandler.isVaildContent(fileContent);
         if (isVaild) {
-            return new IOSSymbolFileHandler(file, fileContent);
+            return new IOSSymbolFileHandler(inputPath, fileContent);
         }
 
         return null;
     }
 
-    private IOSSymbolFileHandler(File file, String fileContent) {
-        this.file = file;
+    private IOSSymbolFileHandler(Path inputPath, String fileContent) {
+        this.inputPath = inputPath;
         this.fileContent = fileContent;
     }
 
@@ -59,50 +54,48 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
     }
 
     @Override
-    public File process() throws IOException, InterruptedException {
-        String inputPathname = this.file.getPath();
-        IOSSymbolCommand cmd = new IOSSymbolCommand(inputPathname, this.dsymPathname);
+    public Path process() throws IOException, InterruptedException {
+        String inputPathname = this.inputPath.toString();
+        IOSSymbolCommand cmd = new IOSSymbolCommand(inputPathname, this.dsymPath.toString());
         List<String> commandLine = Lists.newArrayList("bash", "-c", cmd.command());
         ProcessBuilder pb = new ProcessBuilder(commandLine);
-        File outputFile = new File(this.getOutputDir());
-        pb.directory(outputFile);
+        pb.directory(this.getOutputPath().toFile());
         pb.redirectErrorStream(true);
 
-        String fullPathname = FilenameUtils.getFullPath(inputPathname);
-        String outputFilename = FilenameUtils.getBaseName(inputPathname) + ".txt";
-        this.outputPathname = FilenameUtils.concat(fullPathname, outputFilename);
-        File output = new File(outputPathname);
-        pb.redirectOutput(Redirect.to(output));
+        String outputFilename = this.inputPath.getFileName().toString() + ".txt";
+        Path outputFilePath = this.inputPath.resolveSibling(outputFilename);
+        pb.redirectOutput(Redirect.to(outputFilePath.toFile()));
         Process process = null;
-        File dsymbolFile = null;
+        Path symbolicPath = null;
         try {
             process = pb.start();
             process.waitFor();
-            dsymbolFile = pb.redirectOutput().file();
-        } catch (Exception e) {
-            throw e;
+            File symbolicFile = pb.redirectOutput().file();
+            if (symbolicFile != null) {
+                symbolicPath = symbolicFile.toPath();
+            }
         } finally {
             if (null != process) {
                 process.destroy();
                 process = null;
             }
         }
-        return dsymbolFile;
+        return symbolicPath;
     }
 
-    public String getOutputDir() {
-        if (null == this.outputDir) {
-            this.outputDir = FilenameUtils.getFullPath(this.file.getPath());
+    public Path getOutputPath() {
+        if (null == this.outputPath) {
+            this.outputPath = this.inputPath.getParent();
         }
-        return this.outputDir;
+        return this.outputPath;
     }
 
-    public void setOutputDir(String outputDir) {
-        this.outputDir = outputDir;
+    public void setOutputPath(Path outputPath) {
+        this.outputPath = outputPath;
     }
 
-    public void setDsymPathname(String dsymPathname) {
-        this.dsymPathname = dsymPathname;
+    public void setDsymPath(Path dsymPath) {
+        this.dsymPath = dsymPath;
     }
 
 }

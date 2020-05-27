@@ -1,17 +1,17 @@
 package com.pepper.symbol;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class SymbolicateResult {
     private int statusCode;
     private String desc;
-    private File file;
+    private Path filePath;
     private String fileUrl;
 
     public SymbolicateResult() {
         this.statusCode = 0;
         this.desc = null;
-        this.file = null;
+        this.filePath = null;
         this.fileUrl = null;
     }
 
@@ -31,20 +31,20 @@ public class SymbolicateResult {
         this.desc = desc;
     }
 
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
-    }
-
     public String getFileUrl() {
         return fileUrl;
     }
 
     public void setFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
+    }
+
+    public Path getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(Path filePath) {
+        this.filePath = filePath;
     }
 
 }

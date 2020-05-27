@@ -3,8 +3,10 @@ package com.pepper.symbol;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,9 +20,8 @@ public class ISymbolFileHandlerTest {
         // String pathStr = "/Users/Loriya/Desktop/CrashReport/crashLog/1_parse.crash";
         String inputPathname = "/Users/lijia/Desktop/CrashReport/crashLog/1.crash";
         String dsymPathname = "/Users/lijia/Desktop/CrashReport/build/living.app.dSYM";
-        File file = new File(inputPathname);
-        IOSSymbolFileHandler iosFileHandler = IOSSymbolFileHandler.of(file);
-        iosFileHandler.setDsymPathname(dsymPathname);
+        IOSSymbolFileHandler iosFileHandler = IOSSymbolFileHandler.of(Paths.get(inputPathname));
+        iosFileHandler.setDsymPath(Paths.get(dsymPathname));
         this.fileHandler = iosFileHandler;
     }
 
@@ -50,8 +51,8 @@ public class ISymbolFileHandlerTest {
 
     @Test
     public void testProcesser() throws Exception {
-        File dsymbolFile = this.fileHandler.process();
-        assertTrue(dsymbolFile.exists());
+        Path symbolicPath = this.fileHandler.process();
+        assertTrue(Files.exists(symbolicPath));
         // this.project.getrooten
     }
 }

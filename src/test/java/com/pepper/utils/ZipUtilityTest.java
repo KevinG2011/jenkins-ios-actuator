@@ -2,7 +2,6 @@ package com.pepper.utils;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,10 +27,8 @@ public class ZipUtilityTest {
     public void testUnZip() throws IOException {
         String target = "/Users/lijia/Desktop/CrashReport/build";
         Path targetPath = Paths.get(target);
-        Path zipPath = targetPath.resolve("2517-dSYM.zip");
-        File file = zipPath.toFile();
-        assertTrue(file.canRead());
-        InputStream is = new FileInputStream(file);
+        Path zipPath = targetPath.resolve("2004142105-dSYM.zip");
+        InputStream is = new FileInputStream(zipPath.toString());
         Path unzipPath = ZipUtils.unzipDSYM(is, targetPath);
         assertTrue(Files.exists(unzipPath));
     }
