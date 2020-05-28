@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "CodeLens (Launch) - ISymbolFileHandlerTest",
+      "request": "launch",
+      "mainClass": "com.pepper.symbol.ISymbolFileHandlerTest",
+      "projectName": "ios-actuator"
+    },
+    {
+      "type": "java",
       "name": "Debug (Attach) - Remote",
       "request": "attach",
       "hostName": "localhost",

@@ -2,15 +2,17 @@ package com.pepper.symbol;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
+
+import org.apache.commons.lang.StringUtils;
 
 public class IOSSymbolFileHandler implements ISymbolFileHandler {
 
@@ -57,40 +59,39 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
     @Override
     public Path process() throws IOException, InterruptedException {
         Path dsymFilePath = this.dsymPath.resolveSibling(IOSSymbolConstants.DSYM_FILENAME);
+        StringBuilder cmdBuilder = new StringBuilder();
         if (Files.notExists(dsymFilePath, LinkOption.NOFOLLOW_LINKS)) {
             // 文件不存在解压
-            String unzipCMD = String.format("tar -vxf %s", this.dsymPath.getFileName());
-            List<String> commandLine = Lists.newArrayList("bash", "-c", unzipCMD);
-            ProcessBuilder pb = new ProcessBuilder(commandLine).inheritIO();
-            pb.directory(this.dsymPath.getParent().toFile());
-            pb.redirectErrorStream(true);
-
-            Process process = pb.start();
-            process.waitFor();
-            String command = pb.command().toString();
-            System.out.println("unzip cmd :" + command);
-            process.destroy();
+            String unzipCMD = String.format("unzip -q -n %s && ", this.dsymPath.getFileName());
+            cmdBuilder.append(unzipCMD);
         }
         // 解析
         Path symbolicPath = null;
         String inputPathname = this.inputPath.toString();
+        String dsymFilename = dsymFilePath.getFileName().toString();
+        String symbolCMD = String.format("%s %s -d %s", IOSDSymbolCommand.BIN, // bin
+                StringUtils.defaultString(inputPathname), // inputname
+                StringUtils.defaultString(dsymFilename) // dSYM
+        );
+        cmdBuilder.append(symbolCMD);
 
-        IOSDSymbolCommand cmd = new IOSDSymbolCommand(inputPathname, dsymFilePath.toString());
-        List<String> commandLine = Lists.newArrayList("bash", "-c", cmd.command());
-        ProcessBuilder pb = new ProcessBuilder(commandLine).inheritIO();
-        // pb.directory(this.getOutputPath().toFile());
+        List<String> commandLine = Lists.newArrayList("bash", "-c", cmdBuilder.toString());
+        ProcessBuilder pb = new ProcessBuilder(commandLine);
+        String command = pb.command().toString();
+        System.out.println("cmd :" + command);
+        Map<String, String> env = pb.environment();
+        env.put("DEVELOPER_DIR", "/Applications/XCode.app/Contents/Developer");
+        pb.directory(this.dsymPath.getParent().toFile());
         pb.redirectErrorStream(true);
 
         String outputFilename = this.inputPath.getFileName().toString() + ".txt";
         Path outputFilePath = this.getOutputPath().resolve(outputFilename);
-        pb.redirectOutput(Redirect.to(outputFilePath.toFile()));
+        pb.redirectOutput(outputFilePath.toFile());
 
         Process process = pb.start();
         try {
-            process.waitFor();
-            String command = pb.command().toString();
-            System.out.println("symbolicate cmd :" + command);
             File symbolicFile = pb.redirectOutput().file();
+            process.waitFor();
             if (symbolicFile != null) {
                 symbolicPath = symbolicFile.toPath();
             }
