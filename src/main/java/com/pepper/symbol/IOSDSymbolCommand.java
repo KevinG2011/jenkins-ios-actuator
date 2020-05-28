@@ -2,13 +2,13 @@ package com.pepper.symbol;
 
 import org.apache.commons.lang.StringUtils;
 
-public class IOSSymbolCommand {
+public class IOSDSymbolCommand {
     public static final String EXPORT_CMD = "export DEVELOPER_DIR=/Applications/XCode.app/Contents/Developer";
     public static final String BIN = "/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources/symbolicatecrash";
     private String inputName;
     private String dsymName;
 
-    public IOSSymbolCommand(String inputName, String dsymName) {
+    public IOSDSymbolCommand(String inputName, String dsymName) {
         this.inputName = inputName;
         this.dsymName = dsymName;
     }

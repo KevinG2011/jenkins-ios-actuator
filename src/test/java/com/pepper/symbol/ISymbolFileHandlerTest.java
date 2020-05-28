@@ -44,7 +44,7 @@ public class ISymbolFileHandlerTest {
     public void testCommandLine() {
         String inputName = "/Users/lijia/Desktop/CrashReport/crashLog/1.crash";
         String dsymName = "/Users/lijia/Desktop/CrashReport/build/living.app.dSYM";
-        IOSSymbolCommand cmd = new IOSSymbolCommand(inputName, dsymName);
+        IOSDSymbolCommand cmd = new IOSDSymbolCommand(inputName, dsymName);
         String commandLine = cmd.command();
         assertNotNull(commandLine);
     }

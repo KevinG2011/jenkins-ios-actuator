@@ -1,10 +1,9 @@
-package com.pepper.symbol;
+package com.pepper.jenkins.action;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
-public class ParseSymbolActionTest {
+public class DSymbolActionTest {
     @Before
     public void init() {
     }
@@ -13,8 +12,4 @@ public class ParseSymbolActionTest {
     public void tearDown() throws Exception {
     }
 
-    @Test
-    public void testGetWorkspaceFilePath() {
-
-    }
 }

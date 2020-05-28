@@ -2,13 +2,18 @@ package com.pepper.symbol;
 
 import java.nio.file.Path;
 
-public class SymbolicateResult {
+public class SymbolicResult {
     private int statusCode;
     private String desc;
     private Path filePath;
     private String fileUrl;
+    private String dsymUrl;
 
-    public SymbolicateResult() {
+    public static SymbolicResult resultOf() {
+        return new SymbolicResult();
+    }
+
+    private SymbolicResult() {
         this.statusCode = 0;
         this.desc = null;
         this.filePath = null;
@@ -51,4 +56,11 @@ public class SymbolicateResult {
         return this.filePath.getFileName().toString();
     }
 
+    public String getDsymUrl() {
+        return dsymUrl;
+    }
+
+    public void setDsymUrl(String dsymUrl) {
+        this.dsymUrl = dsymUrl;
+    }
 }

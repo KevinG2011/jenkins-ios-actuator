@@ -1,4 +1,4 @@
-package com.pepper.jenkins;
+package com.pepper.jenkins.controller;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -11,18 +11,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-import com.pepper.jenkins.manager.DSYMFileManager;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DSYMFileManagerTest {
-    private DSYMFileManager fm;
+public class DSymbolControllerTest {
+    private DSymbolController fm;
 
     @Before
     public void init() {
-        this.fm = new DSYMFileManager();
+        this.fm = new DSymbolController();
     }
 
     @After
@@ -31,26 +29,26 @@ public class DSYMFileManagerTest {
 
     @Test
     public void testGetWorkspaceDirectory() {
-        Path dirPath = fm.getWorkspaceDirectory(DSYMFileManager.SYMBOLIC_DIR);
+        Path dirPath = fm.getWorkspaceDirectory(DSymbolController.SYMBOLIC_DIR);
         assertTrue(Files.exists(dirPath, LinkOption.NOFOLLOW_LINKS));
     }
 
     @Test
     public void testGetWorkspaceTmpDirectory() {
-        Path dirPath = fm.getWorkspaceTmpDirectory(DSYMFileManager.CRASH_DIR);
+        Path dirPath = fm.getWorkspaceTmpDirectory(DSymbolController.CRASH_DIR);
         assertTrue(Files.exists(dirPath, LinkOption.NOFOLLOW_LINKS));
     }
 
     @Test
     public void testGetWorkspacePathSegmentsUrl() {
-        String url = fm.getWorkspacePathSegmentsUrl(DSYMFileManager.SYMBOLIC_DIR);
+        String url = fm.getWorkspacePathSegmentsUrl(DSymbolController.SYMBOLIC_DIR);
         assertNotNull(url);
     }
 
     @Test
     public void testCleanupCrash() throws IOException {
         try {
-            Thread t = fm.cleanUpCrashFiles();
+            Thread t = fm.cleanUp();
             t.join();
         } catch (Exception e) {
             fail();

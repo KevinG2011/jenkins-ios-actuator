@@ -56,7 +56,7 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
     @Override
     public Path process() throws IOException, InterruptedException {
         String inputPathname = this.inputPath.toString();
-        IOSSymbolCommand cmd = new IOSSymbolCommand(inputPathname, this.dsymPath.toString());
+        IOSDSymbolCommand cmd = new IOSDSymbolCommand(inputPathname, this.dsymPath.toString());
         List<String> commandLine = Lists.newArrayList("bash", "-c", cmd.command());
         ProcessBuilder pb = new ProcessBuilder(commandLine);
         pb.directory(this.getOutputPath().toFile());
@@ -70,6 +70,8 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
         try {
             process = pb.start();
             process.waitFor();
+            String command = pb.command().toString();
+            System.out.println("command :" + command);
             File symbolicFile = pb.redirectOutput().file();
             if (symbolicFile != null) {
                 symbolicPath = symbolicFile.toPath();

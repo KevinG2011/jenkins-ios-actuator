@@ -9,7 +9,7 @@
          xmlns:s="/lib/samples">
 
   <l:layout title="Actuator">
-    <l:header title='花椒控制中心'></l:header>
+    <l:header title='花椒监控中心'></l:header>
     <l:main-panel>
       <h1>花椒监控中心</h1>
 

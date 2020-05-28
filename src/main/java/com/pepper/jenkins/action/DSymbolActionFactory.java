@@ -1,4 +1,4 @@
-package com.pepper.jenkins.plugins;
+package com.pepper.jenkins.action;
 
 import static java.util.Collections.singleton;
 
@@ -10,8 +10,8 @@ import hudson.model.Project;
 import jenkins.model.TransientActionFactory;
 
 @Extension
-public class ParseSymbolActionFactory extends TransientActionFactory<Project> {
-    private static ParseSymbolAction symbolAction = new ParseSymbolAction();
+public class DSymbolActionFactory extends TransientActionFactory<Project> {
+    private static DSymbolAction symbolAction = new DSymbolAction();
 
     @Override
     public Class<Project> type() {

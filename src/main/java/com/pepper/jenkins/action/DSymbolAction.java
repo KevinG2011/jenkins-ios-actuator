@@ -1,11 +1,11 @@
-package com.pepper.jenkins.plugins;
+package com.pepper.jenkins.action;
 
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import com.pepper.jenkins.manager.DSYMFileManager;
-import com.pepper.symbol.SymbolicateResult;
+import com.pepper.jenkins.controller.DSymbolController;
+import com.pepper.symbol.SymbolicResult;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
@@ -17,19 +17,19 @@ import hudson.model.Action;
 import hudson.model.Item;
 import hudson.model.Project;
 
-public class ParseSymbolAction implements Action, StaplerProxy {
+public class DSymbolAction implements Action, StaplerProxy {
 	private Project project;
-	private DSYMFileManager dsymFileManager;
-	private SymbolicateResult symbolResult;
+	private DSymbolController dsymbolController;
+	private SymbolicResult symbolResult;
 	private String searchDsymLink;
 
-	public ParseSymbolAction() {
-		this.dsymFileManager = new DSYMFileManager();
+	public DSymbolAction() {
+		this.dsymbolController = new DSymbolController();
 	}
 
 	public void setProject(Project project) {
 		this.project = project;
-		this.dsymFileManager.setProject(project);
+		this.dsymbolController.setProject(project);
 	}
 
 	public Project getProject() {
@@ -51,7 +51,7 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 
 	@Override
 	public String getUrlName() {
-		return "ParseSymbolAction";
+		return "DSymbolAction";
 	}
 
 	@Override
@@ -65,28 +65,34 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 		final String nextPage = "";
 		try {
 			final FileItem fileItem = request.getFileItem("file.dsym");
-			this.symbolResult = this.dsymFileManager.symbolicate(fileItem);
-			this.dsymFileManager.cleanUpCrashFiles();
-			execute(request, response, nextPage);
+			this.symbolResult = this.dsymbolController.symbolicate(fileItem);
 		} catch (Exception e) {
 			System.err.println(e);
 		}
+		execute(request, response, nextPage);
 	}
 
-	public void doSearch(final StaplerRequest request, final StaplerResponse response)
-			throws IOException, ServletException {
-		final String str = getRequestParameter(request, "versionNum");
-		if (StringUtils.isNotBlank(str) && StringUtils.isNumeric(str)) {
-			final int versionNum = Integer.parseInt(str.trim());
-			this.searchDsymLink = this.dsymFileManager.findDSYMRemoteUrl(versionNum);
+	public void doSearch(final StaplerRequest request, final StaplerResponse response) throws ServletException {
+		this.symbolResult = null;
+		try {
+			final String str = getRequestParameter(request, "versionNum");
+			if (StringUtils.isNotBlank(str) && StringUtils.isNumeric(str)) {
+				final int versionNum = Integer.parseInt(str.trim());
+				this.symbolResult = this.dsymbolController.findDSYMRemoteUrl(versionNum);
+			}
+		} catch (Exception e) {
+			System.err.println(e);
 		}
 		execute(request, response, "");
 	}
 
-	private void execute(final StaplerRequest request, final StaplerResponse response, final String nextPage)
-			throws IOException {
+	private void execute(final StaplerRequest request, final StaplerResponse response, final String nextPage) {
 		final String url = this.project.getAbsoluteUrl() + this.getUrlName() + nextPage;
-		response.sendRedirect(url);
+		try {
+			response.sendRedirect(url);
+		} catch (IOException e) {
+			System.err.println(e);
+		}
 	}
 
 	private static String getRequestParameter(final StaplerRequest request, final String key) throws ServletException {
@@ -97,7 +103,7 @@ public class ParseSymbolAction implements Action, StaplerProxy {
 		return searchDsymLink;
 	}
 
-	public SymbolicateResult getSymbolResult() {
+	public SymbolicResult getSymbolResult() {
 		return symbolResult;
 	}
 }

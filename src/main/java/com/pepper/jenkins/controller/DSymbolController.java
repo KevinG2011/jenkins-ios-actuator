@@ -1,4 +1,4 @@
-package com.pepper.jenkins.manager;
+package com.pepper.jenkins.controller;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import com.pepper.symbol.IOSSymbolFileHandler;
-import com.pepper.symbol.SymbolicateResult;
+import com.pepper.symbol.SymbolicResult;
 import com.pepper.utils.ZipUtils;
 
 import org.apache.commons.fileupload.FileItem;
@@ -24,7 +24,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 import hudson.model.Project;
 
-public class DSYMFileManager {
+public class DSymbolController {
     public static final String WORKSPACE_DIR = "ws";
     public static final String ARCHIVE_DIR = "archive";
     public static final String CRASH_DIR = "crash";
@@ -42,7 +42,10 @@ public class DSYMFileManager {
     public Path getWorkspaceDirectory(String... subPaths) {
         Path dirPath = null;
         try {
-            final String wsPathname = "/Users/lijia/Documents/Project/Jenkins/ios-actuator/work/workspace/test";
+            String wsPathname = "";
+            if (this.project != null) {
+                wsPathname = this.project.getSomeWorkspace().getRemote();
+            }
             dirPath = Paths.get(wsPathname, subPaths);
             String filename = dirPath.getFileName().toString();
             if (StringUtils.isBlank(FilenameUtils.getExtension(filename))) {
@@ -96,26 +99,31 @@ public class DSYMFileManager {
         return filePath;
     }
 
-    public String findDSYMRemoteUrl(int versionNum) {
+    public SymbolicResult findDSYMRemoteUrl(int versionNum) {
+        SymbolicResult sr = SymbolicResult.resultOf();
         Path path = this.findDSYMLocalPath(versionNum);
         String versionStr = String.valueOf(versionNum);
-        String dsymUrl = null;
         if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
             String dsymFilename = String.format("%s-dSYM.zip", versionStr);
-            dsymUrl = this.getWorkspacePathSegmentsUrl(ARCHIVE_DIR, versionStr, dsymFilename);
+            String dsymUrl = this.getWorkspacePathSegmentsUrl(ARCHIVE_DIR, versionStr, dsymFilename);
+            sr.setDsymUrl(dsymUrl);
         }
 
-        System.out.println("dsymUrl : " + dsymUrl);
-        return dsymUrl;
+        System.out.println("dsymUrl : " + sr.getDsymUrl());
+        return sr;
     }
 
-    public SymbolicateResult symbolicate(FileItem fileItem) {
-        SymbolicateResult sr = new SymbolicateResult();
+    public SymbolicResult symbolicate(FileItem fileItem) {
+        SymbolicResult sr = SymbolicResult.resultOf();
         try {
-            Path tmpCrashPath = this.getWorkspaceTmpDirectory(CRASH_DIR);
-            Path inputPath = tmpCrashPath.resolve(fileItem.getName());
-            Path inputFilePath = Files.write(inputPath, fileItem.get());
             do {
+                if (fileItem == null || StringUtils.isBlank(fileItem.getName())) {
+                    sr.setDesc("请上传文件");
+                    break;
+                }
+                Path tmpCrashPath = this.getWorkspaceTmpDirectory(CRASH_DIR);
+                Path inputPath = tmpCrashPath.resolve(fileItem.getName());
+                Path inputFilePath = Files.write(inputPath, fileItem.get());
                 IOSSymbolFileHandler handler = IOSSymbolFileHandler.of(inputFilePath);
                 if (null == handler) {
                     sr.setDesc("无效的文件内容");
@@ -161,6 +169,7 @@ public class DSYMFileManager {
                     // 设置符号化文件Url
                     String fileUrl = this.getWorkspacePathSegmentsUrl(SYMBOLIC_DIR, filenamePath.toString());
                     sr.setFileUrl(fileUrl);
+                    this.cleanUp();
                 }
             } while (false);
         } catch (Exception e) {
@@ -172,7 +181,7 @@ public class DSYMFileManager {
         return sr;
     }
 
-    public Thread cleanUpCrashFiles() {
+    public Thread cleanUp() {
         Thread t = new Thread(() -> {
             Stream<Path> stream = null;
             try {

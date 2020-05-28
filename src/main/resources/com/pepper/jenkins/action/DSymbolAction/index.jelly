@@ -6,7 +6,7 @@
          xmlns:t="/lib/hudson" 
          xmlns:f="/lib/form" 
          xmlns:i="jelly:fmt">
-    <l:layout title="ParseSymbolAction">
+    <l:layout title="DSymbolAction">
         <l:side-panel>
             <l:tasks>
                 <l:task icon="images/24x24/up.gif" href="${rootURL}/"
@@ -24,27 +24,24 @@
             <h1>崩溃日志解析</h1> 
             <j:set var="sr" value="${it.symbolResult}"/>
             <j:set var="uploaded" value="${request.getParameter('uploaded')}"/>                            
-            <f:form method="post" action="upload" name="upload" enctype="multipart/form-data">
-               <f:section title="上传崩溃日志">
-                    <f:entry title="">
+            <f:section title="在线解析崩溃日志 (Beta版)">
+                <f:entry title="">
+                    <f:form method="post" action="upload" name="upload" enctype="multipart/form-data">
                         <input type="file" name="file.dsym" size="200"/>
-                    </f:entry>
-                    <f:entry title="">
+                        <br/>
+                        <br/>
                         <f:submit value="开始解析"/>
-                    </f:entry>
-                </f:section> 
-
-               <f:section title="解析结果">
+                    </f:form>
+                    <br/>
                     <j:if test="${sr.fileUrl != null}">                
                         <a href="${sr.fileUrl}">${sr.filename}</a>
                     </j:if>
                     <j:if test="${sr.desc != null}">                
                         <div>${sr.desc}</div>
-                    </j:if>
-                </f:section>
-            </f:form>
+                    </j:if>                    
+                </f:entry>
+            </f:section>
             <br/>
-
             <j:set var="versionNum" value="${request.getParameter('versionNum')}"/>
             <f:section title="搜索崩溃日志">
                 <f:entry title="">
@@ -52,14 +49,13 @@
                         输入版本号: <input name="versionNum" type="text" value="${versionNum}"/> <input type="submit" value="搜索"/>
                     </form>
                     <br/>
-                    <j:if test="${it.searchDsymLink != null}">                
-                        <a href="${it.searchDsymLink}">${it.searchDsymLink.substring(it.searchDsymLink.lastIndexOf('/') + 1)}</a>
+                    <j:if test="${sr.dsymUrl != null}">                
+                        <a href="${sr.dsymUrl}">${sr.dsymUrl.substring(sr.dsymUrl.lastIndexOf('/') + 1)}</a>
                     </j:if>
-                    <j:if test="${it.searchDsymLink == null}">                
+                    <j:if test="${sr.dsymUrl == null}">                
                         <div>无法查找</div>
                     </j:if>
                 </f:entry>
-                
             </f:section> 
 
         </l:main-panel>

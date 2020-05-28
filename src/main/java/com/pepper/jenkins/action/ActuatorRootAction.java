@@ -1,4 +1,4 @@
-package com.pepper.jenkins.plugins;
+package com.pepper.jenkins.action;
 
 import com.pepper.utils.ActuatorDiskUtils;
 
