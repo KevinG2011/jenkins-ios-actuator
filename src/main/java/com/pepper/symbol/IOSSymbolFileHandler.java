@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -55,8 +56,25 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
 
     @Override
     public Path process() throws IOException, InterruptedException {
+        Path dsymFilePath = this.dsymPath.resolveSibling(IOSSymbolConstants.DSYM_FILENAME);
+        if (Files.notExists(dsymFilePath, LinkOption.NOFOLLOW_LINKS)) {
+            // 文件不存在解压
+            String unzipCMD = String.format("tar -vxf %s", this.dsymPath.getFileName());
+            List<String> commandLine = Lists.newArrayList("bash", "-c", unzipCMD);
+            ProcessBuilder pb = new ProcessBuilder(commandLine);
+            pb.directory(this.dsymPath.getParent().toFile());
+            pb.redirectErrorStream(true);
+
+            Process process = pb.start();
+            process.waitFor();
+            process.destroy();
+        }
+
+        // 解析
+        Path symbolicPath = null;
         String inputPathname = this.inputPath.toString();
-        IOSDSymbolCommand cmd = new IOSDSymbolCommand(inputPathname, this.dsymPath.toString());
+
+        IOSDSymbolCommand cmd = new IOSDSymbolCommand(inputPathname, dsymFilePath.toString());
         List<String> commandLine = Lists.newArrayList("bash", "-c", cmd.command());
         ProcessBuilder pb = new ProcessBuilder(commandLine);
         // pb.directory(this.getOutputPath().toFile());
@@ -65,22 +83,19 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
         String outputFilename = this.inputPath.getFileName().toString() + ".txt";
         Path outputFilePath = this.getOutputPath().resolve(outputFilename);
         pb.redirectOutput(Redirect.to(outputFilePath.toFile()));
-        Process process = null;
-        Path symbolicPath = null;
+
+        Process process = pb.start();
         try {
-            process = pb.start();
             process.waitFor();
             String command = pb.command().toString();
-            System.out.println("command :" + command);
+            System.out.println("symbolicate cmd :" + command);
             File symbolicFile = pb.redirectOutput().file();
             if (symbolicFile != null) {
                 symbolicPath = symbolicFile.toPath();
             }
         } finally {
-            if (null != process) {
-                process.destroy();
-                process = null;
-            }
+            process.destroy();
+            process = null;
         }
         return symbolicPath;
     }

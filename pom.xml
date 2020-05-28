@@ -10,7 +10,7 @@
 
     <groupId>com.pepper.jenkins.pluins</groupId>
     <artifactId>ios-actuator</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2</version>
     <packaging>hpi</packaging>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/GRaveN+Plugin</url>
     <properties>
