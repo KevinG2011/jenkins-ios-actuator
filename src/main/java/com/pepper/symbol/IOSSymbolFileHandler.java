@@ -61,22 +61,23 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
             // 文件不存在解压
             String unzipCMD = String.format("tar -vxf %s", this.dsymPath.getFileName());
             List<String> commandLine = Lists.newArrayList("bash", "-c", unzipCMD);
-            ProcessBuilder pb = new ProcessBuilder(commandLine);
+            ProcessBuilder pb = new ProcessBuilder(commandLine).inheritIO();
             pb.directory(this.dsymPath.getParent().toFile());
             pb.redirectErrorStream(true);
 
             Process process = pb.start();
             process.waitFor();
+            String command = pb.command().toString();
+            System.out.println("unzip cmd :" + command);
             process.destroy();
         }
-
         // 解析
         Path symbolicPath = null;
         String inputPathname = this.inputPath.toString();
 
         IOSDSymbolCommand cmd = new IOSDSymbolCommand(inputPathname, dsymFilePath.toString());
         List<String> commandLine = Lists.newArrayList("bash", "-c", cmd.command());
-        ProcessBuilder pb = new ProcessBuilder(commandLine);
+        ProcessBuilder pb = new ProcessBuilder(commandLine).inheritIO();
         // pb.directory(this.getOutputPath().toFile());
         pb.redirectErrorStream(true);
 
