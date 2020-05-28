@@ -1,20 +1,17 @@
 package com.pepper.jenkins.controller;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import com.pepper.symbol.IOSSymbolFileHandler;
 import com.pepper.symbol.SymbolicResult;
-import com.pepper.utils.ZipUtils;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
@@ -92,7 +89,7 @@ public class DSymbolController {
         return wsUrl;
     }
 
-    public Path findDSYMLocalPath(int versionNum) {
+    public Path findDSYMPath(int versionNum) {
         String versionStr = String.valueOf(versionNum);
         String fileName = String.format("%d-dSYM.zip", versionNum);
         Path filePath = this.getWorkspaceDirectory(ARCHIVE_DIR, versionStr, fileName);
@@ -101,7 +98,7 @@ public class DSymbolController {
 
     public SymbolicResult findDSYMRemoteUrl(int versionNum) {
         SymbolicResult sr = SymbolicResult.resultOf();
-        Path path = this.findDSYMLocalPath(versionNum);
+        Path path = this.findDSYMPath(versionNum);
         String versionStr = String.valueOf(versionNum);
         if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
             String dsymFilename = String.format("%s-dSYM.zip", versionStr);
@@ -129,7 +126,6 @@ public class DSymbolController {
                     sr.setDesc("无效的文件内容");
                     break;
                 }
-                handler.setOutputPath(tmpCrashPath);
 
                 String versionNum = handler.extractIdentifier();
                 if (StringUtils.isBlank(versionNum)) {
@@ -141,33 +137,28 @@ public class DSymbolController {
                     break;
                 }
                 // 查找本地DSYM文件路径
-                Path dsymLocalPath = this.findDSYMLocalPath(Integer.parseInt(versionNum));
-                if (Files.notExists(dsymLocalPath, LinkOption.NOFOLLOW_LINKS)) {
+                Path dsymPath = this.findDSYMPath(Integer.parseInt(versionNum));
+                if (Files.notExists(dsymPath, LinkOption.NOFOLLOW_LINKS)) {
                     String notFoundStr = String.format("无法查找到[%s]对应的DSYM文件", versionNum);
                     sr.setDesc(notFoundStr);
                     break;
                 }
-                // 解压到指定目录
-                FileInputStream fis = new FileInputStream(dsymLocalPath.toFile());
-                Path dsymPath = ZipUtils.unzipDSYM(fis, tmpCrashPath);
-                if (null == dsymPath) {
-                    sr.setDesc("DSYM文件获取失败");
-                    break;
-                }
+                System.out.println("dsymPath :" + dsymPath.toString());
+
+                Path outputPath = this.getWorkspaceDirectory(SYMBOLIC_DIR);
                 // 设置DSYM路径
                 handler.setDsymPath(dsymPath);
+                // 设置输出目录
+                handler.setOutputPath(outputPath);
                 // 解析文件
                 Path symbolicPath = handler.process();
                 // 设置符号化文件Url
                 if (symbolicPath != null) {
-                    Path filenamePath = symbolicPath.getFileName();
-                    Path targetPath = this.getWorkspaceDirectory(SYMBOLIC_DIR).resolve(filenamePath);
-                    // 移动符号化后的文件到symbol文件夹
-                    Files.move(symbolicPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                     // 设置符号化文件
-                    sr.setFilePath(targetPath);
+                    sr.setFilePath(symbolicPath);
                     // 设置符号化文件Url
-                    String fileUrl = this.getWorkspacePathSegmentsUrl(SYMBOLIC_DIR, filenamePath.toString());
+                    String fileUrl = this.getWorkspacePathSegmentsUrl(SYMBOLIC_DIR,
+                            symbolicPath.getFileName().toString());
                     sr.setFileUrl(fileUrl);
                     this.cleanUp();
                 }
@@ -187,7 +178,7 @@ public class DSymbolController {
             try {
                 Path tmpCrashPath = this.getWorkspaceTmpDirectory(CRASH_DIR);
                 stream = Files.walk(tmpCrashPath, 1);
-                stream.filter(path -> (!path.toString().endsWith("txt"))).forEach(path -> {
+                stream.forEach(path -> {
                     if (tmpCrashPath.compareTo(path) != 0) {
                         FileUtils.deleteQuietly(path.toFile());
                     }

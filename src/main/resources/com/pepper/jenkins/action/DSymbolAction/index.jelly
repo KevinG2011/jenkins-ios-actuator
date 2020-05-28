@@ -52,9 +52,6 @@
                     <j:if test="${sr.dsymUrl != null}">                
                         <a href="${sr.dsymUrl}">${sr.dsymUrl.substring(sr.dsymUrl.lastIndexOf('/') + 1)}</a>
                     </j:if>
-                    <j:if test="${sr.dsymUrl == null}">                
-                        <div>无法查找</div>
-                    </j:if>
                 </f:entry>
             </f:section> 
 

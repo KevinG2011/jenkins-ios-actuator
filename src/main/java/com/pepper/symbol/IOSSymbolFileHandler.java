@@ -59,11 +59,11 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
         IOSDSymbolCommand cmd = new IOSDSymbolCommand(inputPathname, this.dsymPath.toString());
         List<String> commandLine = Lists.newArrayList("bash", "-c", cmd.command());
         ProcessBuilder pb = new ProcessBuilder(commandLine);
-        pb.directory(this.getOutputPath().toFile());
+        // pb.directory(this.getOutputPath().toFile());
         pb.redirectErrorStream(true);
 
         String outputFilename = this.inputPath.getFileName().toString() + ".txt";
-        Path outputFilePath = this.inputPath.resolveSibling(outputFilename);
+        Path outputFilePath = this.getOutputPath().resolve(outputFilename);
         pb.redirectOutput(Redirect.to(outputFilePath.toFile()));
         Process process = null;
         Path symbolicPath = null;
