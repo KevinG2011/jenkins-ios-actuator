@@ -20,6 +20,7 @@
             <j:invoke var="buildClass" on="${currentThread.contextClassLoader}" method="loadClass">
                 <j:arg value="hudson.model.Run"/>
             </j:invoke>
+            <t:progressiveText href="${action.lastBuildNumber}/logText/progressiveHtml" idref="out" spinner="spinner" startOffset="${offset}" />
   -->        
             <h1>崩溃日志解析</h1> 
             <j:set var="sr" value="${it.symbolResult}"/>
@@ -32,6 +33,11 @@
                         <br/>
                         <f:submit value="开始解析"/>
                     </f:form>
+                        <j:when test="${xxx}">
+                            <div id="spinner">
+                                <img src="${imagesURL}/spinner.gif" alt="spinner" />
+                            </div>
+                        </j:when>
                     <br/>
                     <j:if test="${sr.fileUrl != null}">                
                         <a href="${sr.fileUrl}">${sr.filename}</a>

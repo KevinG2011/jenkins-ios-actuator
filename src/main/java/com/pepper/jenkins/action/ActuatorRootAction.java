@@ -15,7 +15,7 @@ public class ActuatorRootAction implements RootAction {
 
     @Override
     public String getDisplayName() {
-        return "花椒控制中心";
+        return "花椒监控中心";
     }
 
     @Override
