@@ -82,7 +82,7 @@ public class IOSSymbolFileHandler implements ISymbolFileHandler {
         Map<String, String> env = pb.environment();
         env.put("DEVELOPER_DIR", "/Applications/XCode.app/Contents/Developer");
         pb.directory(this.dsymPath.getParent().toFile());
-        pb.redirectErrorStream(true);
+        // pb.redirectErrorStream(false);
 
         String outputFilename = this.inputPath.getFileName().toString() + ".txt";
         Path outputFilePath = this.getOutputPath().resolve(outputFilename);

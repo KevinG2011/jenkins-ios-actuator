@@ -174,24 +174,16 @@ public class DSymbolController {
 
     public Thread cleanUp() {
         Thread t = new Thread(() -> {
-            Stream<Path> stream = null;
-            try {
-                Path tmpCrashPath = this.getWorkspaceTmpDirectory(CRASH_DIR);
-                stream = Files.walk(tmpCrashPath, 1);
+            Path tmpCrashPath = this.getWorkspaceTmpDirectory(CRASH_DIR);
+            try (Stream<Path> stream = Files.walk(tmpCrashPath, 1)) {
                 stream.forEach(path -> {
                     if (tmpCrashPath.compareTo(path) != 0) {
                         FileUtils.deleteQuietly(path.toFile());
                     }
                 });
-            } catch (IOException e) {
+            } catch (Exception e) {
                 System.err.println(e.getLocalizedMessage());
-            } finally {
-                if (stream != null) {
-                    stream.close();
-                    stream = null;
-                }
             }
-
         });
         t.start();
         return t;
