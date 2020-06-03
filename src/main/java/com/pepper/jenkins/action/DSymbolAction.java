@@ -51,7 +51,7 @@ public class DSymbolAction implements Action, StaplerProxy {
 
 	@Override
 	public String getUrlName() {
-		return "DSymbolAction";
+		return "dsymbol";
 	}
 
 	@Override
