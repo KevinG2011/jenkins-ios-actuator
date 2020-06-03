@@ -1,8 +1,9 @@
 package com.pepper.jenkins.action;
 
-import static java.util.Collections.singleton;
-
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import hudson.Extension;
 import hudson.model.Action;
@@ -23,7 +24,10 @@ public class DSymbolActionFactory extends TransientActionFactory<Project> {
         if (symbolAction != null) {
             symbolAction.setProject(project);
         }
-        return singleton(symbolAction);
+        VersionMaintainAction vmAction = new VersionMaintainAction();
+        vmAction.setProject(project);
+        Set<Action> set = Stream.of(symbolAction, vmAction).collect(Collectors.toSet());
+        return set;
     }
 
 }

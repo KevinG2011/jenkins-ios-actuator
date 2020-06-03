@@ -1,0 +1,30 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" 
+         xmlns:st="jelly:stapler" 
+         xmlns:d="jelly:define" 
+         xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" 
+         xmlns:f="/lib/form" 
+         xmlns:i="jelly:fmt">
+    <l:layout title="DSymbolAction">
+        <l:side-panel>
+            <l:tasks>
+                <l:task icon="images/24x24/up.gif" href="${rootURL}/"
+                        title="Back to Dashboard"/>
+            </l:tasks>
+        </l:side-panel>    
+        <l:main-panel>
+            <h1>版本信息维护</h1> 
+            <f:section title="版本信息维护">
+                <f:entry title="">
+                    <f:form method="get" action="list" name="list">
+                        <input type="file" name="file.dsym" size="200"/>
+                        <br/>
+                        <br/>
+                        <f:submit value="查询"/>
+                    </f:form>
+                </f:entry>
+            </f:section>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>
