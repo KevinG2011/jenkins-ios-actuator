@@ -1,8 +1,8 @@
-package com.pepper.service;
+package com.pepper.component.service;
 
 import java.util.List;
 
-import com.pepper.dao.IOSReleaseInfoDAO;
+import com.pepper.component.dao.IOSReleaseInfoDAO;
 import com.pepper.entity.IOSReleaseInfo;
 import com.pepper.entity.IOSReleaseInfoExample;
 

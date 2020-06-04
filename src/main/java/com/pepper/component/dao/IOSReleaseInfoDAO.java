@@ -1,4 +1,4 @@
-package com.pepper.dao;
+package com.pepper.component.dao;
 
 import com.pepper.entity.IOSReleaseInfo;
 import com.pepper.entity.IOSReleaseInfoExample;

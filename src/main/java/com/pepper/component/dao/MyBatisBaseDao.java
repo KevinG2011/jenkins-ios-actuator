@@ -1,4 +1,4 @@
-package com.pepper.dao;
+package com.pepper.component.dao;
 
 import java.io.Serializable;
 import java.util.List;

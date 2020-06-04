@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import com.pepper.service.IOSReleaseInfoService;
+import com.pepper.component.service.IOSReleaseInfoService;
 
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
