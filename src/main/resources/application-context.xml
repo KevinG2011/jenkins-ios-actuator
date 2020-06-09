@@ -2,8 +2,27 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation="
 http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
-    <!-- <bean/> definitions here -->
+    <!-- datasource -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/ssm?characterEncoding=utf8" />
+        <property name="username" value="root" />
+        <property name="password" value="admin" />
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- dao -->
+    <bean id="releaseInfoDao" class="com.pepper.component.dao.impl.IOSReleaseInfoJdbcDao">
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+    <!-- service -->
     <bean id="releaseInfoService" class="com.pepper.component.service.IOSReleaseInfoService"></bean>
+
+
+    <!-- <bean/> definitions here -->
 
 
     <bean id="saxophone" class="com.pepper.spring.pojo.Saxophone" />
@@ -14,14 +33,9 @@ http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
         <property name="instrument" ref="piano" />
     </bean>
 
-    <bean id="performancePointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
-        <property name="pattern" value=".*perform" />
-    </bean>
-
+    <!-- 
     <bean id="audienceAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
         <property name="advice" ref="audienceAdvice" />
         <property name="pattern" value=".*perform" />
-    </bean>
-
-    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
+    </bean> -->
 </beans>
