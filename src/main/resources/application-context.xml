@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
     <!-- <bean/> definitions here -->
     <bean id="releaseInfoService" class="com.pepper.component.service.IOSReleaseInfoService"></bean>
+
+
+    <bean id="saxophone" class="com.pepper.spring.pojo.Saxophone" />
+    <bean id="piano" class="com.pepper.spring.pojo.Piano" />
+
+    <bean id="david" class="com.pepper.spring.pojo.Instrumentalist" scope="prototype" autowire="byName">
+        <property name="song" value="Jingle Bells" />
+        <property name="instrument" ref="piano" />
+    </bean>
+
+    <bean id="performancePointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+        <property name="pattern" value=".*perform" />
+    </bean>
+
+    <bean id="audienceAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+        <property name="advice" ref="audienceAdvice" />
+        <property name="pattern" value=".*perform" />
+    </bean>
+
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
 </beans>

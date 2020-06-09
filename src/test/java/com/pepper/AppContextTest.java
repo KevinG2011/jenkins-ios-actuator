@@ -4,7 +4,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 
-import com.pepper.component.service.IOSReleaseInfoService;
+import com.pepper.spring.pojo.Instrumentalist;
 
 import org.junit.After;
 import org.junit.Before;
@@ -24,7 +24,10 @@ public class AppContextTest {
     @Test
     public void testServiceBean() {
         ApplicationContext context = new ClassPathXmlApplicationContext("application-context.xml");
-        IOSReleaseInfoService ris = (IOSReleaseInfoService) context.getBean("releaseInfoService");
-        assertNotNull(ris);
+        Instrumentalist il = (Instrumentalist) context.getBean("david");
+        // IOSReleaseInfoService ris = (IOSReleaseInfoService)
+        // context.getBean("releaseInfoService");
+        assertNotNull(il.getSong());
+        assertNotNull(il.getInstrument());
     }
 }
