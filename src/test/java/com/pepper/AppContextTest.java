@@ -1,5 +1,7 @@
 package com.pepper;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,6 @@ public class AppContextTest {
 
     @Test
     public void testSetup() {
-
+        assertNotNull(context);
     }
 }
