@@ -1,14 +1,14 @@
 package com.pepper.component.dao;
 
-import com.pepper.entity.IOSReleaseInfo;
-import com.pepper.entity.IOSReleaseInfoExample;
+import java.util.List;
 
-import org.apache.ibatis.annotations.Mapper;
+import com.pepper.entity.IOSReleaseInfo;
 
 /**
  * ReleaseDAO继承基类
  */
-@Mapper
-public interface IOSReleaseInfoDAO extends MyBatisBaseDao<IOSReleaseInfo, Integer, IOSReleaseInfoExample> {
+public interface IOSReleaseInfoDao {
+    List<IOSReleaseInfo> findAll();
 
+    IOSReleaseInfo findById(String id);
 }

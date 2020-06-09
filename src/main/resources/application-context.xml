@@ -3,28 +3,26 @@
 http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
     <!-- datasource -->
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
         <property name="url" value="jdbc:mysql://localhost:3306/ssm?characterEncoding=utf8" />
         <property name="username" value="root" />
         <property name="password" value="admin" />
     </bean>
 
-    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    <bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
         <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="sql-map-config.xml" />
     </bean>
 
     <!-- dao -->
-    <bean id="releaseInfoDao" class="com.pepper.component.dao.impl.IOSReleaseInfoJdbcDao">
-        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    <bean id="releaseInfoDao" class="com.pepper.component.dao.impl.IOSReleaseInfoDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
     </bean>
     <!-- service -->
     <bean id="releaseInfoService" class="com.pepper.component.service.IOSReleaseInfoService"></bean>
 
-
     <!-- <bean/> definitions here -->
-
-
     <bean id="saxophone" class="com.pepper.spring.pojo.Saxophone" />
     <bean id="piano" class="com.pepper.spring.pojo.Piano" />
 

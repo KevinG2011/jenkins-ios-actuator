@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="IOSReleaseInfo">
+
+    <resultMap id="BaseResultMap" class="com.pepper.entity.IOSReleaseInfo">
+        <result column="id" property="id" jdbcType="INT" />
+        <result column="ipa_name" jdbcType="VARCHAR" property="ipaName" />
+        <result column="bundle_version" jdbcType="VARCHAR" property="bundleVersion" />
+        <result column="dsym_path" jdbcType="VARCHAR" property="dsymPath" />
+        <result column="build_version" jdbcType="VARCHAR" property="buildVersion" />
+    </resultMap>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        <![CDATA[ 
+            select * from ios_release_info
+        ]]>
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        <![CDATA[ 
+            select * from ios_release_info
+            WHERE id=#id#
+        ]]>
+    </select>
+</sqlMap>
