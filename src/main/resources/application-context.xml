@@ -49,13 +49,18 @@
     </bean>
 
     <!-- dao -->
-    <bean id="releaseInfoDao" class="com.pepper.component.dao.impl.IOSReleaseInfoDaoImpl">
+    <bean id="baseDao" class="com.pepper.component.dao.IOSBaseDao" abstract="true">
         <property name="sqlMapClient" ref="sqlMapClient" />
     </bean>
-    <!-- service -->
-    <bean id="releaseInfoService" class="com.pepper.component.service.IOSReleaseInfoService"></bean>
 
-    <!-- <bean/> definitions here -->
+    <bean id="releaseInfoDao" class="com.pepper.component.dao.impl.IOSReleaseInfoDaoImpl" parent="baseDao"></bean>
+
+    <!-- service -->
+    <bean id="releaseInfoService" class="com.pepper.component.service.IOSReleaseInfoService">
+        <property name="releaseInfoDao" ref="releaseInfoDao" />
+    </bean>
+
+    <!-- test -->
     <bean id="saxophone" class="com.pepper.spring.pojo.Saxophone" />
     <bean id="piano" class="com.pepper.spring.pojo.Piano" />
 

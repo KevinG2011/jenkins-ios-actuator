@@ -37,7 +37,7 @@ public class IOSReleaseInfoDaoTest {
     @Test
     public void testFindById() {
         IOSReleaseInfoDao dao = (IOSReleaseInfoDaoImpl) context.getBean("releaseInfoDao");
-        IOSReleaseInfo releaseInfo = dao.findById("5");
+        IOSReleaseInfo releaseInfo = dao.findById(5);
         assertNotNull(releaseInfo);
     }
 }

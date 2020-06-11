@@ -2,17 +2,11 @@ package com.pepper.jenkins.action;
 
 import com.pepper.utils.ActuatorDiskUtils;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import hudson.Extension;
 import hudson.model.RootAction;
 
 @Extension
 public class ActuatorRootAction implements RootAction {
-    static {
-        ApplicationContext context = new ClassPathXmlApplicationContext();
-    }
 
     @Override
     public String getIconFileName() {

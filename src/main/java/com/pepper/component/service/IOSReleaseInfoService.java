@@ -12,13 +12,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class IOSReleaseInfoService {
     @Autowired
-    IOSReleaseInfoDao releaseDao;
+    IOSReleaseInfoDao releaseInfoDao;
 
-    public List<IOSReleaseInfo> list() {
+    public void setReleaseInfoDao(IOSReleaseInfoDao releaseInfoDao) {
+        this.releaseInfoDao = releaseInfoDao;
+    }
+
+    public List<IOSReleaseInfo> getAll() {
         return new ArrayList<>();
     }
 
     public List<IOSReleaseInfo> add(IOSReleaseInfo release) {
+
         return new ArrayList<>();
     }
 
