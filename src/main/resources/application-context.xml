@@ -1,13 +1,29 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation="
 http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
     <!-- datasource -->
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://localhost:3306/ssm?characterEncoding=utf8" />
-        <property name="username" value="root" />
-        <property name="password" value="admin" />
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:application.properties" />
+    </bean>
+    <!-- datasource -->
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+        <property name="maxConnectionsPerPartition" value="30" />
+        <property name="minConnectionsPerPartition" value="10" />
+        <property name="partitionCount" value="3" />
+        <property name="acquireIncrement" value="5" />
+        <property name="statementsCacheSize" value="100" />
+        <property name="releaseHelperThreads" value="3" />
+
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+        <property name="jdbcUrl" value="${spring.datasource.url}" />
+        <property name="username" value="${spring.datasource.username}" />
+        <property name="password" value="${spring.datasource.password}" />
+    </bean>
+
+    <!-- transactions -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
     </bean>
 
     <bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">

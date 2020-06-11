@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <jmxConfigurator />
+    <!--输出到控制台,方便调试,应用时切换到文件Log -->
+    <appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date %-5level [%logger{80}:%L] - %msg%n  
+            </pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    <!-- 需要记录日志的包 -->
+    <logger name="com.pepper.component.service">
+        <level value="debug" />
+    </logger>
+    <logger name="org.springframework">
+        <level value="warn" />
+    </logger>
+    <root>
+        <level value="warn" />
+        <appender-ref ref="ConsoleAppender" />
+    </root>
+</configuration>

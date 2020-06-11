@@ -16,7 +16,7 @@
         ]]>
     </select>
 
-    <select id="selectById" resultMap="BaseResultMap">
+    <select id="selectById" resultMap="BaseResultMap" parameterClass="int">
         <![CDATA[ 
             select * from ios_release_info
             WHERE id=#id#
