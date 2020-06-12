@@ -26,13 +26,14 @@
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource" />
     </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" />
 
     <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>
             <tx:method name="get*" read-only="true" />
             <tx:method name="insert*" rollback-for="Exception" />
-            <tx:method name="add*" rollback-for="Exception" />
-            <tx:method name="addOrUpdate*" rollback-for="Exception" />
+            <tx:method name="add*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="addOrUpdate*" propagation="REQUIRED" rollback-for="Exception" />
             <tx:method name="del*" rollback-for="Exception" />
             <tx:method name="update*" rollback-for="Exception" />
         </tx:attributes>
