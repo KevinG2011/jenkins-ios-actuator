@@ -8,25 +8,25 @@
         <property name="location" value="classpath:application.properties" />
     </bean>
     <!-- datasource -->
-    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
-        <property name="maxConnectionsPerPartition" value="30" />
-        <property name="minConnectionsPerPartition" value="10" />
-        <property name="partitionCount" value="3" />
-        <property name="acquireIncrement" value="5" />
-        <property name="statementsCacheSize" value="100" />
-        <property name="releaseHelperThreads" value="3" />
-
-        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="driverClassName" value="${spring.datasource.driverClass}" />
         <property name="jdbcUrl" value="${spring.datasource.url}" />
         <property name="username" value="${spring.datasource.username}" />
         <property name="password" value="${spring.datasource.password}" />
+
+        <property name="minimumIdle" value="1" />
+        <property name="idleTimeout" value="10000" />
+        <property name="maximumPoolSize" value="2" />
+        <property name="maxLifetime" value="30000" />
+        <property name="poolName" value="MyHikariCP" />
     </bean>
 
-    <!-- transactions -->
+    <!-- transactions 
+        <tx:annotation-driven transaction-manager="transactionManager" />
+    -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource" />
     </bean>
-    <tx:annotation-driven transaction-manager="transactionManager" />
 
     <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>

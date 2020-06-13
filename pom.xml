@@ -81,7 +81,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
+            <version>8.0.12</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/cglib/cglib-nodep -->
@@ -105,11 +105,11 @@
             <version>2.3.4.726</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.jolbox/bonecp -->
+        <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
         <dependency>
-            <groupId>com.jolbox</groupId>
-            <artifactId>bonecp</artifactId>
-            <version>0.7.1.RELEASE</version>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.3.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-core -->
