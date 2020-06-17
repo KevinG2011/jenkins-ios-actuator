@@ -61,6 +61,8 @@
         <property name="releaseInfoDao" ref="releaseInfoDao" />
     </bean>
 
+    <import resource="jms.xml" />
+
     <!-- test -->
     <bean id="saxophone" class="com.pepper.spring.pojo.Saxophone" />
     <bean id="piano" class="com.pepper.spring.pojo.Piano" />
