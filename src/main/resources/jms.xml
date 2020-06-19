@@ -7,17 +7,34 @@
         <property name="brokerURL" value="tcp://localhost:61616" />
     </bean>
 
-    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-        <property name="connectionFactory" ref="connectionFactory" />
-    </bean>
-
     <!-- 消息队列 -->
     <bean id="rantzDestination" class="org.apache.activemq.command.ActiveMQQueue">
         <constructor-arg index="0" value="rantz.marketing.queue" />
     </bean>
     <!-- 消息主题 
-    <bean id="rantzDestination" class="org.apache.activemq.command.ActiveMQTopic">
-        <constructor-arg index="0" value="rantz.marketing.topic" />
-    </bean>
+        <bean id="rantzDestination" class="org.apache.activemq.command.ActiveMQTopic">
+            <constructor-arg index="0" value="rantz.marketing.topic" />
+        </bean>
     -->
+
+    <bean id="releaseInfoConverter" class="com.pepper.jms.IAReleaseInfoMessageConverter"></bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="defaultDestination" ref="rantzDestination" />
+        <property name="messageConverter" ref="releaseInfoConverter" />
+        <property name="receiveTimeout" value="60000" />
+    </bean>
+
+    <bean id="jmsMsgHandler" class="com.pepper.jms.controller.IAJMSController"></bean>
+    <!-- 以异步方式处理消息-->
+    <bean id="releaseMsgHandler" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <property name="delegate" ref="jmsMsgHandler" />
+        <property name="defaultListenerMethod" value="onRecevReleaseInfoMsg" />
+        <property name="messageConverter" ref="releaseInfoConverter" />
+    </bean>
+    <!-- 以同步方式处理消息 -->
+    <bean id="reorderGateway" class="com.pepper.jms.IAReorderGatewayImpl">
+        <property name="jmsTemplate" ref="jmsTemplate" />
+    </bean>
 </beans>

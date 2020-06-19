@@ -4,4 +4,6 @@ import com.pepper.entity.IOSReleaseInfo;
 
 public interface IAReorderGateway {
     void sendReorderInfo(IOSReleaseInfo releaseInfo);
+
+    IOSReleaseInfo receiveReleaseMessage();
 }
