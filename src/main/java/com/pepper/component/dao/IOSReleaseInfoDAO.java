@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.pepper.entity.IOSReleaseInfo;
 
-/**
- * ReleaseDAO继承基类
- */
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface IOSReleaseInfoDao {
     List<IOSReleaseInfo> findAll();
 

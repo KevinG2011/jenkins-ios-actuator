@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xsi:schemaLocation="
-     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
-     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xsi:schemaLocation="
+     http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+     http://www.springframework.org/schema/context 
+     http://www.springframework.org/schema/context/spring-context-2.5.xsd
+     http://www.springframework.org/schema/tx 
+     http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+     http://www.springframework.org/schema/aop 
+     http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
     <!-- datasource -->
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:application.properties" />
@@ -57,24 +62,28 @@
     <bean id="releaseInfoDao" class="com.pepper.component.dao.impl.IOSReleaseInfoDaoImpl" parent="baseDao"></bean>
 
     <!-- service -->
-    <bean id="releaseInfoService" class="com.pepper.component.service.IOSReleaseInfoService">
+    <!-- <bean id="releaseInfoService" class="com.pepper.component.service.IOSReleaseInfoService">
         <property name="releaseInfoDao" ref="releaseInfoDao" />
-    </bean>
+    </bean> -->
 
-    <import resource="jms.xml" />
+    <context:component-scan base-package="com.pepper.component.service"></context:component-scan>
 
-    <!-- test -->
-    <bean id="saxophone" class="com.pepper.spring.pojo.Saxophone" />
-    <bean id="piano" class="com.pepper.spring.pojo.Piano" />
-
-    <bean id="david" class="com.pepper.spring.pojo.Instrumentalist" scope="prototype" autowire="byName">
-        <property name="song" value="Jingle Bells" />
-        <property name="instrument" ref="piano" />
-    </bean>
+    <!-- test 
+        <bean id="saxophone" class="com.pepper.spring.pojo.Saxophone" />
+        <bean id="piano" class="com.pepper.spring.pojo.Piano" />
+        
+        <bean id="david" class="com.pepper.spring.pojo.Instrumentalist" scope="prototype" autowire="byName">
+            <property name="song" value="Jingle Bells" />
+            <property name="instrument" ref="piano" />
+        </bean>
+    -->
 
     <!-- 
-    <bean id="audienceAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-        <property name="advice" ref="audienceAdvice" />
-        <property name="pattern" value=".*perform" />
-    </bean> -->
+        <bean id="audienceAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+            <property name="advice" ref="audienceAdvice" />
+            <property name="pattern" value=".*perform" />
+        </bean> -->
+
+    <!-- jms -->
+    <!-- <import resource="jms.xml" /> -->
 </beans>
