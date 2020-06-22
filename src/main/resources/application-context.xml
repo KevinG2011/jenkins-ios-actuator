@@ -54,19 +54,7 @@
         <property name="configLocation" value="sql-map-config.xml" />
     </bean>
 
-    <!-- dao -->
-    <bean id="baseDao" class="com.pepper.component.dao.IOSBaseDao" abstract="true">
-        <property name="sqlMapClient" ref="sqlMapClient" />
-    </bean>
-
-    <bean id="releaseInfoDao" class="com.pepper.component.dao.impl.IOSReleaseInfoDaoImpl" parent="baseDao"></bean>
-
-    <!-- service -->
-    <!-- <bean id="releaseInfoService" class="com.pepper.component.service.IOSReleaseInfoService">
-        <property name="releaseInfoDao" ref="releaseInfoDao" />
-    </bean> -->
-
-    <context:component-scan base-package="com.pepper.component.service"></context:component-scan>
+    <context:component-scan base-package="com.pepper.component"></context:component-scan>
 
     <!-- test 
         <bean id="saxophone" class="com.pepper.spring.pojo.Saxophone" />

@@ -1,6 +1,6 @@
 package com.pepper;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import com.pepper.component.service.IOSReleaseInfoService;
 
@@ -29,6 +29,10 @@ public class IOSReleaseInfoServiceTest {
     public void testGetService() {
         IOSReleaseInfoService service = (IOSReleaseInfoService) context.getBean("releaseInfoService",
                 IOSReleaseInfoService.class);
-        assertNotNull(service);
+        try {
+            service.getAll();
+        } catch (Exception e) {
+            fail();
+        }
     }
 }

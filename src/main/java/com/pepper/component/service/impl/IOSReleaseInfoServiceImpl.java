@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service(value = "releaseInfoService")
+@Service("releaseInfoService")
 // @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 public class IOSReleaseInfoServiceImpl implements IOSReleaseInfoService {
     @Autowired
@@ -23,6 +23,7 @@ public class IOSReleaseInfoServiceImpl implements IOSReleaseInfoService {
     }
 
     public List<IOSReleaseInfo> getAll() {
+        System.out.println(releaseInfoDao);
         return new ArrayList<>();
     }
 

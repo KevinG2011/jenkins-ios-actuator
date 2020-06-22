@@ -3,11 +3,25 @@ package com.pepper.component.dao.impl;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import com.ibatis.sqlmap.client.SqlMapClient;
 import com.pepper.component.dao.IOSBaseDao;
 import com.pepper.component.dao.IOSReleaseInfoDao;
 import com.pepper.entity.IOSReleaseInfo;
 
+import org.springframework.stereotype.Repository;
+
+@Repository()
 public class IOSReleaseInfoDaoImpl extends IOSBaseDao implements IOSReleaseInfoDao {
+    @Resource(name = "sqlMapClient")
+    private SqlMapClient sqlMapClient;
+
+    @PostConstruct
+    public void initSqlMapClient() {
+        super.setSqlMapClient(sqlMapClient);
+    }
 
     @Override
     @SuppressWarnings("unchecked")
