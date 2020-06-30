@@ -13,7 +13,7 @@ import com.pepper.entity.IOSReleaseInfo;
 
 import org.springframework.stereotype.Repository;
 
-@Repository()
+@Repository("releaseInfoDao")
 public class IOSReleaseInfoDaoImpl extends IOSBaseDao implements IOSReleaseInfoDao {
     @Resource(name = "sqlMapClient")
     private SqlMapClient sqlMapClient;
